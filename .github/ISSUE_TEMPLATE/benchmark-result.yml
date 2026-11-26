@@ -1,0 +1,31 @@
+name: Benchmark 自报
+description: 提交带版本、协议与证据的实验成绩，进入人工审核。
+title: '[Benchmark 自报] '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        自报结果的初始状态是「待审核／复现未验证」。格式通过不代表成绩真实、协议一致或维护者已复现。
+        请附上本地预览下载或本地检查通过的 JSON。在线投稿服务尚未发布；可向 [源码仓库](https://github.com/ArthurQQQQ/NeuralBank)提交 PR。
+        Issue 本身不运行 checker；把 JSON 放进 submissions/ 的 PR 才会进入 CI。
+  - type: textarea
+    id: result
+    attributes:
+      label: 模型、Benchmark 与评估协议
+      description: 指明准确模型变体、代码版本、指标、数据集划分与关键配置。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 贡献 JSON 与公开证据
+      description: 附上 JSON 文件或 PR 路径，以及配置和日志的公开链接；命令只作记录，不会由 CI 执行。
+    validations:
+      required: true
+  - type: checkboxes
+    id: provenance
+    attributes:
+      label: 结果来源
+      options:
+        - label: 我已区分论文报告与自行实验，并说明尚未完成的验证。
+          required: true

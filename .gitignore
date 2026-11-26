@@ -1,0 +1,7 @@
+dist/
+.local/
+node_modules/
+.DS_Store
+*.log
+*.tar.gz
+.openai/*.json.tmp

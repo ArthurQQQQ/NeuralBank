@@ -1,0 +1,1996 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neuralbank.example/schemas/submission.schema.json",
+  "title": "NeuralBank community submission · schema version 1",
+  "description": "格式与评测元数据检查；不执行用户命令，不验证真实性或复现，不产生 approved/validated/reproduced 状态。文字按 trim 后验证；所有输出仍应作为纯文本转义。",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "pattern": "[\\p{L}\\p{N}]",
+          "allOf": [
+            {
+              "not": {
+                "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+              }
+            },
+            {
+              "not": {
+                "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+              }
+            }
+          ]
+        },
+        "modelId": {
+          "type": "string",
+          "enum": [
+            "perceptron",
+            "mlp",
+            "cnn",
+            "rnn",
+            "lstm",
+            "transformer",
+            "autoencoder",
+            "resnet",
+            "gru",
+            "unet",
+            "vit",
+            "vae",
+            "gan",
+            "hopfield",
+            "modern-hopfield",
+            "ntm",
+            "dnc",
+            "log-linear-attention",
+            "mamba3",
+            "rae",
+            "titans",
+            "gated-attention",
+            "canon-layer",
+            "ahn",
+            "flowstate",
+            "repack-refine"
+          ]
+        },
+        "kind": {
+          "const": "benchmark-result"
+        },
+        "benchmarkId": {
+          "type": "string",
+          "enum": [
+            "hellaswag-acc-norm",
+            "lv-eval-128k-avg",
+            "imagenet-1k-top1",
+            "imagenet-1k-top1-error",
+            "imagenet-256-fid",
+            "gift-eval-normalized-mase",
+            "gift-eval-normalized-crps"
+          ]
+        },
+        "reportedModel": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 200,
+          "pattern": "[\\p{L}\\p{N}]",
+          "allOf": [
+            {
+              "not": {
+                "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+              }
+            },
+            {
+              "not": {
+                "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+              }
+            }
+          ]
+        },
+        "modelRevision": {
+          "type": "object",
+          "properties": {
+            "repositoryUrl": {
+              "type": "string",
+              "minLength": 9,
+              "maxLength": 2048,
+              "format": "uri",
+              "pattern": "^https://[^/?#@\\s]+(?:[/?#][^\\s]*)?$",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|[\\\\]"
+                  }
+                }
+              ]
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^(?:[a-fA-F0-9]{40}|[a-fA-F0-9]{64})$"
+            },
+            "artifactUrl": {
+              "type": "string",
+              "minLength": 9,
+              "maxLength": 2048,
+              "format": "uri",
+              "pattern": "^https://[^/?#@\\s]+(?:[/?#][^\\s]*)?$",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|[\\\\]"
+                  }
+                }
+              ]
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-fA-F0-9]{64}$"
+            }
+          },
+          "required": [
+            "repositoryUrl",
+            "commit"
+          ],
+          "additionalProperties": false,
+          "dependentRequired": {
+            "artifactUrl": [
+              "sha256"
+            ],
+            "sha256": [
+              "artifactUrl"
+            ]
+          }
+        },
+        "score": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "metric": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 200,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "unit": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "direction": {
+              "enum": [
+                "higher",
+                "lower"
+              ]
+            }
+          },
+          "required": [
+            "value",
+            "metric",
+            "unit",
+            "direction"
+          ],
+          "additionalProperties": false
+        },
+        "dataset": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 500,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "split": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 500,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            }
+          },
+          "required": [
+            "version",
+            "split"
+          ],
+          "additionalProperties": false
+        },
+        "evaluation": {
+          "type": "object",
+          "properties": {
+            "framework": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 200,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "version": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 200,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "conditions": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "framework",
+            "version",
+            "conditions"
+          ],
+          "additionalProperties": false
+        },
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "architecture": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 2000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "parameterCount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "trainingData": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 2000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "trainingProcedure": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 2000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "precision": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 200,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "preprocessing": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 2000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "inference": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 2000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            }
+          },
+          "required": [
+            "architecture",
+            "parameterCount",
+            "trainingData",
+            "trainingProcedure",
+            "precision",
+            "preprocessing",
+            "inference"
+          ],
+          "additionalProperties": false
+        },
+        "reproduction": {
+          "type": "object",
+          "properties": {
+            "repositoryUrl": {
+              "type": "string",
+              "minLength": 9,
+              "maxLength": 2048,
+              "format": "uri",
+              "pattern": "^https://[^/?#@\\s]+(?:[/?#][^\\s]*)?$",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|[\\\\]"
+                  }
+                }
+              ]
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^(?:[a-fA-F0-9]{40}|[a-fA-F0-9]{64})$"
+            },
+            "configUrl": {
+              "type": "string",
+              "minLength": 9,
+              "maxLength": 2048,
+              "format": "uri",
+              "pattern": "^https://[^/?#@\\s]+(?:[/?#][^\\s]*)?$",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|[\\\\]"
+                  }
+                }
+              ]
+            },
+            "logUrl": {
+              "type": "string",
+              "minLength": 9,
+              "maxLength": 2048,
+              "format": "uri",
+              "pattern": "^https://[^/?#@\\s]+(?:[/?#][^\\s]*)?$",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|[\\\\]"
+                  }
+                }
+              ]
+            },
+            "command": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 2000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            }
+          },
+          "required": [
+            "repositoryUrl",
+            "commit",
+            "configUrl",
+            "logUrl",
+            "command"
+          ],
+          "additionalProperties": false
+        },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "hardware": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 1500,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "software": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 2000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            }
+          },
+          "required": [
+            "hardware",
+            "software"
+          ],
+          "additionalProperties": false
+        },
+        "notes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 1000,
+            "pattern": "[\\p{L}\\p{N}]",
+            "allOf": [
+              {
+                "not": {
+                  "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                }
+              },
+              {
+                "not": {
+                  "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "displayName",
+        "modelId",
+        "kind",
+        "benchmarkId",
+        "reportedModel",
+        "modelRevision",
+        "score",
+        "dataset",
+        "evaluation",
+        "configuration",
+        "reproduction",
+        "environment",
+        "notes"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "benchmarkId": {
+                "const": "hellaswag-acc-norm"
+              }
+            },
+            "required": [
+              "benchmarkId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "metric": {
+                    "const": "Length-normalized accuracy"
+                  },
+                  "unit": {
+                    "const": "%"
+                  },
+                  "direction": {
+                    "const": "higher"
+                  }
+                },
+                "required": [
+                  "value",
+                  "metric",
+                  "unit",
+                  "direction"
+                ],
+                "additionalProperties": false
+              },
+              "evaluation": {
+                "type": "object",
+                "properties": {
+                  "framework": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "conditions": {
+                    "type": "object",
+                    "properties": {
+                      "shots": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "contextLength": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "promptTemplate": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 2000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "scoring": {
+                        "type": "string",
+                        "const": "acc_norm"
+                      },
+                      "scoringDetails": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 2000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "shots",
+                      "contextLength",
+                      "promptTemplate",
+                      "scoring",
+                      "scoringDetails"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "framework",
+                  "version",
+                  "conditions"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "benchmarkId": {
+                "const": "lv-eval-128k-avg"
+              }
+            },
+            "required": [
+              "benchmarkId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "metric": {
+                    "const": "Avg. score（论文报告）"
+                  },
+                  "unit": {
+                    "const": "分"
+                  },
+                  "direction": {
+                    "const": "higher"
+                  }
+                },
+                "required": [
+                  "value",
+                  "metric",
+                  "unit",
+                  "direction"
+                ],
+                "additionalProperties": false
+              },
+              "evaluation": {
+                "type": "object",
+                "properties": {
+                  "framework": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "conditions": {
+                    "type": "object",
+                    "properties": {
+                      "shots": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "contextLength": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "promptTemplate": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 2000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "scoring": {
+                        "type": "string",
+                        "const": "lv-eval-official-task-metrics"
+                      },
+                      "scoringDetails": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 2000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "lengthLevel": {
+                        "type": "string",
+                        "const": "128k"
+                      },
+                      "taskSet": {
+                        "type": "array",
+                        "minItems": 11,
+                        "maxItems": 11,
+                        "uniqueItems": true,
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "hotpotwikiqa_mixup",
+                            "loogle_SD_mixup",
+                            "loogle_CR_mixup",
+                            "loogle_MIR_mixup",
+                            "multifieldqa_en_mixup",
+                            "multifieldqa_zh_mixup",
+                            "factrecall_en",
+                            "factrecall_zh",
+                            "cmrc_mixup",
+                            "lic_mixup",
+                            "dureader_mixup"
+                          ]
+                        }
+                      },
+                      "aggregation": {
+                        "type": "string",
+                        "const": "unweighted-arithmetic-mean-over-tasks"
+                      }
+                    },
+                    "required": [
+                      "shots",
+                      "contextLength",
+                      "promptTemplate",
+                      "scoring",
+                      "scoringDetails",
+                      "lengthLevel",
+                      "taskSet",
+                      "aggregation"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "framework",
+                  "version",
+                  "conditions"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "benchmarkId": {
+                "const": "imagenet-1k-top1"
+              }
+            },
+            "required": [
+              "benchmarkId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "metric": {
+                    "const": "Top-1 accuracy"
+                  },
+                  "unit": {
+                    "const": "%"
+                  },
+                  "direction": {
+                    "const": "higher"
+                  }
+                },
+                "required": [
+                  "value",
+                  "metric",
+                  "unit",
+                  "direction"
+                ],
+                "additionalProperties": false
+              },
+              "evaluation": {
+                "type": "object",
+                "properties": {
+                  "framework": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "conditions": {
+                    "type": "object",
+                    "properties": {
+                      "resolution": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 200,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "crops": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "pretraining": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 1000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "resolution",
+                      "crops",
+                      "pretraining"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "framework",
+                  "version",
+                  "conditions"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "benchmarkId": {
+                "const": "imagenet-1k-top1-error"
+              }
+            },
+            "required": [
+              "benchmarkId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "metric": {
+                    "const": "Top-1 error"
+                  },
+                  "unit": {
+                    "const": "%"
+                  },
+                  "direction": {
+                    "const": "lower"
+                  }
+                },
+                "required": [
+                  "value",
+                  "metric",
+                  "unit",
+                  "direction"
+                ],
+                "additionalProperties": false
+              },
+              "evaluation": {
+                "type": "object",
+                "properties": {
+                  "framework": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "conditions": {
+                    "type": "object",
+                    "properties": {
+                      "resolution": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 200,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "crops": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "pretraining": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 1000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "resolution",
+                      "crops",
+                      "pretraining"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "framework",
+                  "version",
+                  "conditions"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "benchmarkId": {
+                "const": "imagenet-256-fid"
+              }
+            },
+            "required": [
+              "benchmarkId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "metric": {
+                    "const": "FID-50K"
+                  },
+                  "unit": {
+                    "const": ""
+                  },
+                  "direction": {
+                    "const": "lower"
+                  }
+                },
+                "required": [
+                  "value",
+                  "metric",
+                  "unit",
+                  "direction"
+                ],
+                "additionalProperties": false
+              },
+              "evaluation": {
+                "type": "object",
+                "properties": {
+                  "framework": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "conditions": {
+                    "type": "object",
+                    "properties": {
+                      "resolution": {
+                        "type": "string",
+                        "const": "256 × 256"
+                      },
+                      "sampleCount": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991,
+                        "const": 50000
+                      },
+                      "sampler": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 500,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "samplingSteps": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "guidance": {
+                        "type": "string",
+                        "minLength": 8,
+                        "maxLength": 1000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "referenceDataset": {
+                        "type": "string",
+                        "const": "ImageNet-1K training set"
+                      },
+                      "referenceStatistics": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 1500,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "resolution",
+                      "sampleCount",
+                      "sampler",
+                      "samplingSteps",
+                      "guidance",
+                      "referenceDataset",
+                      "referenceStatistics"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "framework",
+                  "version",
+                  "conditions"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "benchmarkId": {
+                "const": "gift-eval-normalized-mase"
+              }
+            },
+            "required": [
+              "benchmarkId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "metric": {
+                    "const": "Normalized MASE"
+                  },
+                  "unit": {
+                    "const": ""
+                  },
+                  "direction": {
+                    "const": "lower"
+                  }
+                },
+                "required": [
+                  "value",
+                  "metric",
+                  "unit",
+                  "direction"
+                ],
+                "additionalProperties": false
+              },
+              "evaluation": {
+                "type": "object",
+                "properties": {
+                  "framework": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "conditions": {
+                    "type": "object",
+                    "properties": {
+                      "contextLength": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "forecastHorizon": {
+                        "type": "string",
+                        "minLength": 8,
+                        "maxLength": 1000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "taskCount": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991,
+                        "const": 97
+                      },
+                      "taskMetric": {
+                        "type": "string",
+                        "const": "MASE"
+                      },
+                      "baseline": {
+                        "type": "string",
+                        "const": "Seasonal Naive"
+                      },
+                      "baselineVersion": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 500,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "normalization": {
+                        "type": "string",
+                        "const": "per-task-score-divided-by-baseline"
+                      },
+                      "aggregation": {
+                        "type": "string",
+                        "const": "geometric-mean"
+                      }
+                    },
+                    "required": [
+                      "contextLength",
+                      "forecastHorizon",
+                      "taskCount",
+                      "taskMetric",
+                      "baseline",
+                      "baselineVersion",
+                      "normalization",
+                      "aggregation"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "framework",
+                  "version",
+                  "conditions"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "benchmarkId": {
+                "const": "gift-eval-normalized-crps"
+              }
+            },
+            "required": [
+              "benchmarkId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "metric": {
+                    "const": "Normalized quantile CRPS"
+                  },
+                  "unit": {
+                    "const": ""
+                  },
+                  "direction": {
+                    "const": "lower"
+                  }
+                },
+                "required": [
+                  "value",
+                  "metric",
+                  "unit",
+                  "direction"
+                ],
+                "additionalProperties": false
+              },
+              "evaluation": {
+                "type": "object",
+                "properties": {
+                  "framework": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "pattern": "[\\p{L}\\p{N}]",
+                    "allOf": [
+                      {
+                        "not": {
+                          "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                        }
+                      },
+                      {
+                        "not": {
+                          "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                        }
+                      }
+                    ]
+                  },
+                  "conditions": {
+                    "type": "object",
+                    "properties": {
+                      "contextLength": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "forecastHorizon": {
+                        "type": "string",
+                        "minLength": 8,
+                        "maxLength": 1000,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "taskCount": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991,
+                        "const": 97
+                      },
+                      "taskMetric": {
+                        "type": "string",
+                        "const": "quantile-CRPS"
+                      },
+                      "baseline": {
+                        "type": "string",
+                        "const": "Seasonal Naive"
+                      },
+                      "baselineVersion": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 500,
+                        "pattern": "[\\p{L}\\p{N}]",
+                        "allOf": [
+                          {
+                            "not": {
+                              "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                            }
+                          },
+                          {
+                            "not": {
+                              "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                            }
+                          }
+                        ]
+                      },
+                      "normalization": {
+                        "type": "string",
+                        "const": "per-task-score-divided-by-baseline"
+                      },
+                      "aggregation": {
+                        "type": "string",
+                        "const": "geometric-mean"
+                      }
+                    },
+                    "required": [
+                      "contextLength",
+                      "forecastHorizon",
+                      "taskCount",
+                      "taskMetric",
+                      "baseline",
+                      "baselineVersion",
+                      "normalization",
+                      "aggregation"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "framework",
+                  "version",
+                  "conditions"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "pattern": "[\\p{L}\\p{N}]",
+          "allOf": [
+            {
+              "not": {
+                "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+              }
+            },
+            {
+              "not": {
+                "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+              }
+            }
+          ]
+        },
+        "modelId": {
+          "type": "string",
+          "enum": [
+            "perceptron",
+            "mlp",
+            "cnn",
+            "rnn",
+            "lstm",
+            "transformer",
+            "autoencoder",
+            "resnet",
+            "gru",
+            "unet",
+            "vit",
+            "vae",
+            "gan",
+            "hopfield",
+            "modern-hopfield",
+            "ntm",
+            "dnc",
+            "log-linear-attention",
+            "mamba3",
+            "rae",
+            "titans",
+            "gated-attention",
+            "canon-layer",
+            "ahn",
+            "flowstate",
+            "repack-refine"
+          ]
+        },
+        "kind": {
+          "const": "model-edit"
+        },
+        "changes": {
+          "type": "object",
+          "properties": {
+            "tagline": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 160,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 3000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "input": {
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 500,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "output": {
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 500,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "formula": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 1000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "formulaExplanation": {
+              "type": "string",
+              "minLength": 15,
+              "maxLength": 2000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "keyPoints": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 8,
+                "maxLength": 700,
+                "pattern": "[\\p{L}\\p{N}]",
+                "allOf": [
+                  {
+                    "not": {
+                      "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                    }
+                  },
+                  {
+                    "not": {
+                      "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                    }
+                  }
+                ]
+              }
+            },
+            "pitfall": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 1000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            },
+            "learningGoal": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 1000,
+              "pattern": "[\\p{L}\\p{N}]",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+                  }
+                }
+              ]
+            }
+          },
+          "required": [],
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 9,
+            "maxLength": 2048,
+            "format": "uri",
+            "pattern": "^https://[^/?#@\\s]+(?:[/?#][^\\s]*)?$",
+            "allOf": [
+              {
+                "not": {
+                  "pattern": "__REQUIRED|[\\\\]"
+                }
+              }
+            ]
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 2000,
+          "pattern": "[\\p{L}\\p{N}]",
+          "allOf": [
+            {
+              "not": {
+                "pattern": "__REQUIRED|^\\s*(?:[Tt][Oo][Dd][Oo]|[Tt][Bb][Dd]|[Nn]\\/?[Aa]|[Nn][Uu][Ll][Ll]|[Nn][Oo][Nn][Ee]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]|[Tt][Ee][Ss][Tt]|待填写|待补充|待完善|待确认|待定|未知|占位|暂无|示例|测试)[\\s.。!！_-]*$"
+              }
+            },
+            {
+              "not": {
+                "pattern": "<\\s*\\/?\\s*(?:[Ss][Cc][Rr][Ii][Pp][Tt]|[Ss][Vv][Gg]|[Ii][Ff][Rr][Aa][Mm][Ee]|[Oo][Bb][Jj][Ee][Cc][Tt]|[Ee][Mm][Bb][Ee][Dd]|[Ii][Mm][Gg]|[Ss][Tt][Yy][Ll][Ee]|[Ll][Ii][Nn][Kk]|[Mm][Ee][Tt][Aa]|[Ff][Oo][Rr][Mm])(?:\\s|/|>)|(?:[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]|[Vv][Bb][Ss][Cc][Rr][Ii][Pp][Tt])\\s*:"
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "displayName",
+        "modelId",
+        "kind",
+        "changes",
+        "sources",
+        "rationale"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

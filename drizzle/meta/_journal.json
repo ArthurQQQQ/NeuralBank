@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1795401600000,
+      "tag": "0000_community_contributions",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1795679113788,
+      "tag": "0001_personal_learning",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795682615404,
+      "tag": "0002_community_submissions",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "kind": "model-edit",
+  "displayName": "验证用虚构编辑者，非真实贡献",
+  "modelId": "perceptron",
+  "changes": {
+    "description": "这是虚构编辑建议，仅演示合法 JSON 结构。感知机将输入加权求和并经过阈值函数，形成二分类输出；单层感知机不能表示所有非线性可分问题。",
+    "formula": "y = 1 if wᵀx + b >= 0; y = 0 if wᵀx + b < 0"
+  },
+  "sources": [
+    "https://example.org/fictional-neuralbank/teaching-reference"
+  ],
+  "rationale": "此条为虚构格式验证建议，不应合并到正式模型。用于检查教学文字白名单、数学比较符号、来源字段及修改理由。"
+}

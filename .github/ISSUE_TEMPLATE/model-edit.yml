@@ -1,0 +1,30 @@
+name: 模型编辑建议
+description: 纠正现有模型的讲解、维度或原理，并附格式检查通过的 JSON。
+title: '[模型建议] '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        可在本地预览的模型编辑入口生成 JSON，或按 [仓库](https://github.com/ArthurQQQQ/NeuralBank) 中的 CONTRIBUTING.md 填写。在线投稿服务尚未发布。
+        Issue 是讨论入口；它不会自动更改模型内容。要运行仓库 CI，请把 JSON 放进 submissions/ 并提交 PR。
+  - type: input
+    id: model
+    attributes:
+      label: 现有模型 ID
+      placeholder: transformer
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: 问题与建议
+      description: 说明当前哪里不准确、建议如何修改，以及具体原始出处。
+    validations:
+      required: true
+  - type: textarea
+    id: submission
+    attributes:
+      label: 贡献 JSON 与校验结果
+      description: 附上下载的 JSON 文件或相应 PR 路径，并填写本地 checker 的结果。不要粘贴账户凭据或私人学习记录。
+    validations:
+      required: true

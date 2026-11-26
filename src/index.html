@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <script src="/appearance.js"></script>
+  <meta name="description" content="你的神经网络学习库。按关卡理解架构、记录掌握进度，查看语言、视觉与时序任务的论文报告成绩。">
+  <title>NeuralBank · 我的学习库</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#learning">跳到学习面板</a>
+  <header class="site-header wrap">
+    <a class="brand" href="#learning" aria-label="NeuralBank 首页">
+      <svg class="brand-mark" width="35" height="35" viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M8 8 18 5 28 12 26 27 13 30 5 20 8 8ZM8 8l18 19M18 5l-5 25M5 20l23-8M8 8l20 4M5 20l21 7" stroke="currentColor" stroke-width="1.2"/><g fill="#111827" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="28" cy="12" r="3"/><circle cx="26" cy="27" r="3"/><circle cx="13" cy="30" r="3"/><circle cx="5" cy="20" r="3"/></g></svg>
+      <span>Neural<span class="brand-light">Bank</span></span>
+    </a>
+    <nav class="main-nav" aria-label="主导航"><a class="active" href="#learning" aria-current="page">学习面板</a><a href="#models">架构库</a><a href="#benchmarks">Benchmarks</a><a href="#contribute">贡献</a></nav>
+    <div class="header-tools"><span class="header-progress" id="header-progress">0 / 26</span><label class="appearance-control"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13V3.5Z" fill="currentColor"/></svg><select id="appearance" aria-label="外观"><option value="system">自动</option><option value="light">浅色</option><option value="dark">深色</option></select></label><button class="account-button" id="account-button" aria-haspopup="dialog" aria-label="我的学习账户"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2" stroke="currentColor" stroke-width="1.5"/></svg><span id="account-label">我的学习库</span></button></div>
+  </header>
+  <main class="app-main">
+    <section class="dashboard wrap app-view" id="learning" aria-labelledby="learning-title">
+      <h1 class="visually-hidden" id="learning-title">我的学习面板</h1>
+      <div class="dashboard-overview" id="dashboard-overview"></div>
+      <div class="panel-heading"><h2>我的架构</h2><span id="track-count"></span></div>
+      <div class="learning-modules" id="learning-modules" aria-label="选择学习板块"></div>
+      <section class="level-section" aria-labelledby="level-title"><div class="panel-heading"><div><span class="eyebrow" id="level-eyebrow"></span><h2 id="level-title">基础前馈</h2></div><button class="text-button" id="browse-track">在架构库中查看</button></div><div class="level-board" id="level-board"></div></section>
+    </section>
+    <div class="library-section app-view" id="library-view" hidden>
+    <section class="catalog wrap" id="models" aria-labelledby="catalog-title">
+      <div class="section-heading"><div><h2 id="catalog-title">架构库</h2></div><label class="search-box"><svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.5"/></svg><input id="model-search" type="search" placeholder="搜索模型、概念…" aria-label="搜索模型或概念"><kbd>/</kbd></label></div>
+      <div class="catalog-toolbar"><div class="filter-heading"><span>按架构机制</span><div class="catalog-shortcuts"><button class="text-button" id="explore-recent">三会新架构</button><button class="memory-shortcut text-button" id="explore-memory">记忆网络</button></div></div><div class="filter-row"><div class="category-filters" id="category-filters" role="group" aria-label="按模型类别筛选"></div><span class="results-label" id="results-count" aria-live="polite"></span></div><details class="catalog-options"><summary>筛选难度、会议与掌握状态</summary><div class="difficulty-row"><span class="filter-label">学习难度</span><div id="difficulty-filters" class="difficulty-filters" role="group" aria-label="按学习难度筛选"></div><button class="text-button reset-filters" id="reset-filters" hidden>重置筛选</button></div><p class="difficulty-guide" id="difficulty-guide">难度按理解核心机制所需的前置知识划分，可与类别组合筛选。</p><div class="source-row"><span class="filter-label">论文来源</span><div id="venue-filters" class="source-filters" role="group" aria-label="按会议来源筛选"></div></div><p id="venue-guide" class="difficulty-guide"></p><div class="mastery-filter-row"><span class="filter-label">我的标注</span><div id="mastery-filters" class="mastery-filters" role="group" aria-label="按掌握状态筛选"></div></div></details></div>
+      <div class="category-context" id="category-context" hidden></div>
+      <div class="catalog-status"><span id="visible-models" role="status" aria-live="polite"></span><span>每个模型都附结构、公式与自测</span></div>
+      <div class="catalog-groups" id="model-grid"></div>
+      <div id="empty-state" class="empty-state" hidden><h3>还没有找到这个模型</h3><p>试试其他关键词、类别、来源或掌握状态，也可以重置筛选查看全部模型。</p><button class="button secondary" id="clear-search">查看全部模型</button></div>
+      <p class="atlas-note"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="currentColor"/><path d="M10 9v5m0-9v1" stroke="currentColor"/></svg> 按主要教学机制归类，类别并不限制模型用途。结构图为代表性示意，具体维度见模型说明。</p>
+    </section>
+
+    </div>
+
+
+    <section class="benchmarks-section wrap app-view" id="benchmarks" aria-labelledby="benchmarks-title" hidden>
+      <div class="section-heading"><h1 id="benchmarks-title">Benchmarks</h1><div class="benchmark-header-actions"><span class="results-label" id="benchmark-count"></span><button class="button secondary" data-open-contribution="benchmark-result">上报我的成绩</button></div></div>
+      <div class="benchmark-tools"><div class="task-filters" id="task-filters" role="group" aria-label="按任务筛选 Benchmark"></div><label class="search-box"><svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.5"/></svg><input id="benchmark-search" type="search" placeholder="搜索任务、Benchmark、模型…" aria-label="搜索任务、Benchmark 或模型"></label></div>
+      <div id="benchmark-list" class="benchmark-list"></div>
+      <p class="benchmark-note">成绩对应论文中的具体模型配置。请结合指标、数据划分与评测条件阅读；缺少成绩不代表模型表现差。</p>
+    </section>
+
+    <section class="contribution-section wrap app-view" id="contribute" aria-labelledby="contribution-title" hidden>
+      <div class="section-heading contribution-heading"><div><h1 id="contribution-title">开放共建</h1><p>改进一份讲解，或分享一次自己的评测。</p></div><div class="contribution-links"><a class="text-button" href="https://github.com/ArthurQQQQ/NeuralBank" target="_blank" rel="noopener noreferrer">GitHub 源码</a><a class="text-button" href="/submission.schema.json" download="neuralbank-submission.schema.json">下载格式规范</a></div></div>
+      <div class="contribution-workspace">
+        <div class="submission-editor-panel">
+          <div class="contribution-kinds" id="contribution-kinds" role="group" aria-label="选择贡献类型"><button data-contribution-kind="benchmark-result" class="active" aria-pressed="true">上报 Benchmark</button><button data-contribution-kind="model-edit" aria-pressed="false">编辑模型</button></div>
+          <div class="contribution-targets"><label>架构条目<select id="contribution-model"></select></label><label id="benchmark-target">Benchmark<select id="contribution-benchmark"></select></label></div>
+          <div class="submission-editor-toolbar"><label for="submission-json" id="submission-editor-label">运行报告 · JSON</label><div><label class="text-button file-import">导入 JSON<input id="import-report" type="file" accept="application/json,.json"></label><button class="text-button" id="reset-report">重置模板</button></div></div>
+          <textarea id="submission-json" class="submission-json" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="submission-draft-note draft-status"></textarea>
+          <div class="editor-footnote"><span id="draft-status" role="status" aria-live="polite">等待检查</span><span id="submission-draft-note">草稿保留在当前页面，可下载保存</span></div>
+          <div class="submission-actions"><button class="button primary" id="check-report">运行格式检查</button><button class="button secondary" id="download-report">下载投稿 JSON</button></div>
+        </div>
+        <aside class="submission-review-panel">
+          <div class="validation-panel" id="validation-panel" aria-labelledby="validation-title"><span class="eyebrow">投稿测试器</span><h2 id="validation-title">等待检查</h2><p id="validation-description" aria-live="polite"></p><ul class="validation-errors" id="validation-errors"></ul><div class="validation-details" id="validation-details" hidden><strong id="validation-target"></strong><span>✓ 数据结构与字段</span><span>✓ 指标、单位与取值范围</span><span>✓ 评测条件与材料字段</span><span class="validation-unverified">待人工审核 · 尚未复现</span></div></div>
+          <div class="submission-guide"><h3>填写提示</h3><ol id="submission-guide"></ol><p>检查器检查格式与声明的评测条件，不运行模型，也不验证链接内容或成绩真实性。</p></div>
+          <div class="submission-send"><p id="contribution-session"></p><button class="button primary" id="submit-report" disabled>提交待审核</button><p class="submission-status" id="submission-status" role="status" aria-live="polite"></p></div>
+        </aside>
+      </div>
+      <section class="community-submissions" aria-labelledby="submissions-title"><div class="panel-heading"><div><h2 id="submissions-title">社区投稿</h2><span id="submission-count"></span></div><button class="text-button" id="refresh-submissions">刷新列表</button></div><p class="submission-feed-note" id="submission-feed-note">格式通过、待审核的内容会在这里展示。</p><div class="submission-feed" id="submission-feed"></div></section>
+    </section>
+  </main>
+  <footer class="app-footer wrap"><span>NeuralBank</span><span id="learning-storage-note" role="status">进度保存在此浏览器</span><button class="text-button" id="credits-button">参考与致谢</button></footer>
+  <dialog id="account-dialog" class="form-dialog account-dialog" aria-labelledby="account-title"><div class="dialog-top"><h2 id="account-title">我的学习库</h2><button class="icon-button" data-close="account-dialog" aria-label="关闭账户面板">×</button></div><div id="account-content" aria-live="polite"></div></dialog>
+  <dialog id="model-dialog" class="model-dialog" aria-labelledby="model-title"><div id="model-detail"></div></dialog>
+  <dialog id="credits-dialog" class="form-dialog" aria-labelledby="credits-title"><div class="dialog-top"><h2 id="credits-title">向这些探索者致敬</h2><button class="icon-button close-dialog" data-close="credits-dialog" aria-label="关闭参考与致谢">×</button></div><p class="form-description">NeuralBank 希望把跨架构学习串起来。下面这些项目的图谱与交互方式，也值得亲手探索。各模型的原始资料见详情中的“核心原理”。</p><div class="credits-links"><a href="https://dlarabic.com/en/ai-model-atlas/" target="_blank" rel="noopener noreferrer"><strong>AI Model Atlas</strong><span>分类架构图谱、公式、参数计算与模型比较</span></a><a href="https://www.asimovinstitute.org/neural-network-zoo/" target="_blank" rel="noopener noreferrer"><strong>Neural Network Zoo</strong><span>用统一的节点图总览多种网络架构</span></a><a href="https://playground.tensorflow.org/" target="_blank" rel="noopener noreferrer"><strong>TensorFlow Playground</strong><span>通过真实训练理解小型神经网络</span></a><a href="https://poloclub.github.io/cnn-explainer/" target="_blank" rel="noopener noreferrer"><strong>CNN Explainer</strong><span>进入卷积神经网络的每一步计算</span></a><a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener noreferrer"><strong>Transformer Explainer</strong><span>探索 Transformer 的文本生成过程</span></a><a href="https://tensorspace.org/html/playground/index.html" target="_blank" rel="noopener noreferrer"><strong>TensorSpace Playground</strong><span>在三维视图中探索网络层和特征图</span></a><a href="https://alexlenail.me/NN-SVG/" target="_blank" rel="noopener noreferrer"><strong>NN-SVG</strong><span>绘制并导出神经网络架构图</span></a><a href="https://netron.app/" target="_blank" rel="noopener noreferrer"><strong>Netron</strong><span>查看已有模型文件的计算图</span></a></div></dialog>
+  <div id="toast" class="toast" role="status"></div>
+</body>
+</html>

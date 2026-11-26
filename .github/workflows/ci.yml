@@ -1,0 +1,38 @@
+name: Validate contributions
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out pull request
+        # Official actions/checkout v7.0.1 tag, verified 2026-11-26.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        # Official actions/setup-node v7.1.0 tag, verified 2026-11-26.
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      # No dependency installation is needed: this project uses Node built-ins.
+      # These checks use local fixtures/mocks. Never deploy, POST submissions to
+      # a production site, or execute a command supplied inside submission JSON.
+      - name: Check submission JSON
+        run: npm run check:submission
+      - name: Run tests
+        run: npm test
+      - name: Build the site
+        run: npm run build

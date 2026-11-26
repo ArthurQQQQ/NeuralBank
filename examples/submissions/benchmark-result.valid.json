@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "kind": "benchmark-result",
+  "displayName": "验证用虚构提交者，非真实作者",
+  "modelId": "mamba3",
+  "benchmarkId": "hellaswag-acc-norm",
+  "reportedModel": "虚构格式验证模型 Fixture-Mamba；并不存在此训练结果",
+  "modelRevision": {
+    "repositoryUrl": "https://example.org/fictional-neuralbank/model",
+    "commit": "1111111111111111111111111111111111111111"
+  },
+  "score": {
+    "value": 12.34,
+    "metric": "Length-normalized accuracy",
+    "unit": "%",
+    "direction": "higher"
+  },
+  "dataset": {
+    "version": "fictional-format-fixture-v1；非真实数据版本",
+    "split": "虚构 validation 子集；仅演示元数据字段"
+  },
+  "evaluation": {
+    "framework": "虚构 Fixture Evaluation Harness",
+    "version": "fictional-v1.0.0",
+    "conditions": {
+      "shots": 0,
+      "contextLength": 1024,
+      "promptTemplate": "虚构模板：给出上下文和四个候选项；此描述只供格式测试，不对应真实运行。",
+      "scoring": "acc_norm",
+      "scoringDetails": "虚构协议：使用评测框架的候选长度归一化评分选取答案；此处没有执行评测。"
+    }
+  },
+  "configuration": {
+    "architecture": "虚构 Mamba 家族配置，宽度和层数只作为测试文本；不是网站教学图的运行结果。",
+    "parameterCount": 1000000,
+    "trainingData": "虚构训练数据 Fixture-Corpus-v1；并不存在本条模型的实际训练。",
+    "trainingProcedure": "虚构过程：说明训练来源和超参数的位置，实际没有运行训练或评估。",
+    "precision": "虚构 BF16 推理、FP32 评分",
+    "preprocessing": "虚构预处理：固定分词器、右侧截断至 1024 token；只用于格式验证。",
+    "inference": "虚构推理：batch size 1，逐候选计算分数，无生成采样；没有执行。"
+  },
+  "reproduction": {
+    "repositoryUrl": "https://example.org/fictional-neuralbank/evaluation",
+    "commit": "2222222222222222222222222222222222222222",
+    "configUrl": "https://example.org/fictional-neuralbank/config.json",
+    "logUrl": "https://example.org/fictional-neuralbank/evaluation.log",
+    "command": "python fictional_evaluate.py --config fictional-config.json"
+  },
+  "environment": {
+    "hardware": "虚构硬件：1 张测试用 GPU，16 GB 显存；不代表实际设备。",
+    "software": "虚构环境：Linux、Python 3.12、PyTorch 2.5；并未安装或执行这个环境。"
+  },
+  "notes": [
+    "此文件中的模型、分数、commit、URL、硬件与运行信息均为虚构格式测试数据，不可作为成绩发布。",
+    "验证通过只说明结构和元数据字段齐全；没有下载链接、运行命令或独立复现。"
+  ]
+}
