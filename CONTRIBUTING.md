@@ -76,6 +76,18 @@ JSON 是公开贡献材料，请勿放入账户 ID、浏览器学习缓存、访
 6. 近期论文还需正式的 `venue`、`problemSolved`、`methodChange`、`limitations` 和 `evidence`，并说明结果适用的模型、数据和实验范围。
 7. 新增模型 ID 后，用 `node scripts/check-submission.mjs --schema > schemas/submission.schema.json` 更新下载规范，确保运行时与 CI 接受同样的模型。运行检查与构建；界面变更要在桌面和窄屏查看图示、焦点和键盘操作。
 
+### 多轴分类与 Agent 接入
+
+在 `src/architecture-metadata.js` 为每个模型提供受控的任务、机制、输入/输出、特性、条目类型、教学范围、用途、取舍和关联条目。将完整模型、构建模块、架构家族与训练框架分清；给定教学配置的因果性不能直接推广到整个家族，未标注某特性也不是该特性不存在的证明。任务标签表示选型线索，不能当作测得的成绩或硬件保证。
+
+`src/architecture-catalog.js` 是 MCP 与公开 JSON 的共享查询层。来源和局限必须随结果保留，硬约束不可静默放宽。新增 ID 后补齐元数据与测试；如已启用云端学习，还须以新的数据库迁移扩充允许的模型 ID，保留既有迁移。公开数据由构建生成，不能加入个人进度、登录 token 或用户投稿中的执行命令。
+
+```sh
+node --test server/catalog.test.mjs server/public-catalog.test.mjs
+npm --prefix mcp ci --ignore-scripts
+npm --prefix mcp test
+```
+
 ### 正式 Benchmark 数据
 
 在 `src/benchmarks.js` 维护任务、指标定义与具体模型成绩，保留 `reportedModel`、`configuration`、`protocol`、`conditions`、`comparisonKey`、`source` 和 `notes`。原论文表格需能定位；指标明确单位和高低方向。模型家族不能自动继承某个配置的成绩；外部对照模型可使用 `modelId: null`。
@@ -88,7 +100,7 @@ node scripts/validate-benchmarks.mjs
 
 ### 学习进度与持久化
 
-保留已有模型 ID 和访客存储键 `neuralbank-learned`，新增架构不能清空旧进度。家族调整只改变归类，不改变掌握状态。静态版只保存本地进度，不显示云登录或向服务端 POST；访客本地保存不能描述为账户同步。
+保留已有模型 ID 和访客存储键 `neuralbank-learned`，新增架构不能清空旧进度。家族调整只改变归类，不改变掌握状态。未配置 Supabase 的静态版使用访客本地进度；已配置的账户通过可信身份、资格检查与 RLS 同步。访客本地保存不能描述为账户同步。静态投稿继续使用 PR，不因增加个人登录而自动获得生产投稿 API。
 
 账户同步由 `src/learning-sync.js` 与 `/api/learning` 负责：身份来自受信平台；浏览器缓存按稳定用户 ID 隔离；待同步操作、版本冲突和账户切换都需要保留保护。请求中的账户头只作为一致性前提，不能用来授予身份。访客数据只在明确操作后导入账户。
 

@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: '22'
           package-manager-cache: false
-      # No dependency installation is needed: this project uses Node built-ins.
+      # Website checks use Node built-ins and the committed browser SDK bundle.
       # These checks use local fixtures/mocks. Never deploy, POST submissions to
       # a production site, or execute a command supplied inside submission JSON.
       - name: Check submission JSON
@@ -36,3 +36,9 @@ jobs:
         run: npm test
       - name: Build the site
         run: npm run build
+      - name: Build the public static site
+        run: npm run build:static
+      - name: Install isolated MCP dependencies
+        run: npm --prefix mcp ci --ignore-scripts
+      - name: Test MCP protocol and tools
+        run: npm --prefix mcp test

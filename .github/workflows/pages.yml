@@ -40,7 +40,16 @@ jobs:
         run: npm test
       - name: Check submission JSON
         run: npm run check:submission
+      - name: Install isolated MCP dependencies
+        run: npm --prefix mcp ci --ignore-scripts
+      - name: Test MCP protocol and tools
+        run: npm --prefix mcp test
       - name: Build public static site
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_PUBLIC_KEY: ${{ vars.SUPABASE_PUBLIC_KEY }}
+          NEURALBANK_GITHUB_AUTH_ENABLED: ${{ vars.NEURALBANK_GITHUB_AUTH_ENABLED }}
+          NEURALBANK_EMAIL_AUTH_ENABLED: ${{ vars.NEURALBANK_EMAIL_AUTH_ENABLED }}
         run: npm run build:static
       - name: Upload static site artifact
         # actions/upload-pages-artifact v5.0.0; official tag verified 2026-11-26.

@@ -37,12 +37,12 @@ npm run check:submission -- path/to/submission.json
 | --- | --- | --- |
 | 架构图、学习路径、Benchmark 浏览 | 支持 | 支持 |
 | 当前浏览器的学习进度 | 支持 | 支持 |
-| 账户登录与跨设备同步 | 不提供 | 需要受信平台身份与数据库 |
+| 账户登录与跨设备同步 | 配置 Supabase 后支持 GitHub／高校邮箱 | 受信平台身份或独立配置的 Supabase |
 | 浏览器内严格 JSON 格式检查 | 支持 | 支持 |
 | 下载 JSON，向源码仓库提交 PR | 支持 | 支持 |
 | HTTP 投稿与待审核队列 | 不提供 | 需要可用的投稿 API 与存储 |
 
-静态版不发送服务端投稿请求，也不把浏览器进度描述为云同步。它可由普通静态服务器托管；服务端版本继续保留账户及数据库 API，供后续部署。
+静态版通过 PR 接收贡献。未配置身份服务时，学习进度保存在浏览器；配置 Supabase 后，账户进度由独立后端保存。服务端版本继续保留原平台账户与数据库 API。
 
 ## 架构与学习路径
 
@@ -70,11 +70,25 @@ npm run check:submission -- path/to/submission.json
 
 掌握状态由用户手动标注，不因浏览或答对一道题自动完成。访客继续使用当前浏览器的 `neuralbank-learned` 模型 ID 数组，保留原有进度。
 
-GitHub Pages 版只使用上述浏览器记录，不显示云登录或调用个人学习库 API。
+GitHub Pages 默认保留访客学习库。配置 Supabase Auth、数据库迁移、GitHub OAuth App 和邮件服务后，可以启用 GitHub 登录与高校邮箱验证码登录。学校邮箱资格由可信后端检查，域名库须带出处与审核记录；不以一个 `edu` 后缀作为全球高校认证。配置与验收见 [登录部署文档](docs/auth.md)。未配置的登录入口保持禁用状态。
 
 服务端托管环境通过 `GET /api/session` 确认平台身份；`GET/PUT /api/learning` 仅访问当前账户的记录。客户端按稳定账户 ID 隔离缓存，保存每个模型的待同步意图，并基于服务器版本合并多设备冲突。访客记录只在明确选择“合并到我的学习库”后导入账户。
 
 界面区分本地保存、加载、同步、成功和失败；浏览器存储不可用时说明记录仅在当前会话有效。真实登录和跨设备同步须在可用的托管环境验收。
+
+## Agent 检索与 MCP
+
+64 个条目另有适用任务、输入/输出类型、机制、因果/双向特性、条目类型、选型取舍与关联架构。属性描述当前教学配置；候选匹配不能替代真实实验，也不形成跨任务性能总排名。
+
+[MCP 接入文档](docs/mcp.md) 包含 Claude、Codex 等客户端配置。使用官方 SDK 的独立 stdio 服务提供五个只读工具：列分类、搜索、看详情、比较和带硬约束的候选建议。原始来源、局限和分页会随结果返回。
+
+静态站也提供 [catalog.json](https://arthurqqqq.github.io/NeuralBank/catalog.json)、[taxonomy.json](https://arthurqqqq.github.io/NeuralBank/taxonomy.json)、[agent-manifest.json](https://arthurqqqq.github.io/NeuralBank/agent-manifest.json) 与 [llms.txt](https://arthurqqqq.github.io/NeuralBank/llms.txt)。这些是公开数据资源；本地 MCP 通过 stdio 连接。个人进度、账号身份与投稿命令不进入这套工具。
+
+```sh
+npm --prefix mcp ci --ignore-scripts
+npm --prefix mcp test
+node mcp/server.mjs
+```
 
 ## Benchmark 与贡献
 
@@ -99,12 +113,15 @@ Benchmark 成绩绑定具体模型变体、指标和评估协议，保留配置�
 | `src/diagrams.js`、`src/expanded-diagrams.js`、`src/taxonomy.js` | 原创 SVG 图与家族、层级定义 |
 | `src/benchmarks.js` | 正式收录的任务、指标与成绩 |
 | `src/learning-progress.js`、`src/learning-sync.js` | 访客记录、账户缓存与同步 |
+| `src/architecture-metadata.js`、`src/architecture-catalog.js` | 多轴分类与共享只读查询 |
+| `mcp/`、`docs/mcp.md` | 官方 SDK MCP 服务、协议测试与接入说明 |
+| `src/cloud-auth.js`、`auth/`、`supabase/` | 身份适配、官方 SDK 生成工具、RLS／资格检查与迁移 |
 | `schemas/submission.schema.json`、`scripts/check-submission.mjs` | 贡献格式与本地检查器 |
 | `server/`、`drizzle/` | API、持久化与数据库迁移 |
 | `.github/workflows/ci.yml` | PR 的格式、测试与构建检查 |
 | `.github/workflows/pages.yml` | 默认分支的静态公开版构建与 Pages 部署 |
 
-Pages 工作流只在本仓库默认分支的推送或手动触发时运行，先完成测试、投稿检查与静态构建，再上传 `dist-static/` 并部署；不在 PR 中部署。PR CI 继续使用只读权限，不调用生产投稿 API，也不注入生产凭据。
+Pages 工作流只在本仓库默认分支的推送或手动触发时运行，先完成测试、投稿检查、真实 MCP 协议测试与静态构建，再上传 `dist-static/` 并部署；不在 PR 中部署。PR CI 继续使用只读权限，不调用生产投稿 API，也不注入生产凭据。身份服务的公开地址与 publishable key 通过明确的仓库变量注入，构建拒绝 service-role 或 secret key。
 
 服务端构建将前端资源与 API 打包进 `dist/server/index.js`。Sites 配置位于 `.openai/hosting.json`，使用逻辑 D1 绑定 `DB`，不设置 `static`。已有迁移不可改写；自行托管服务端版本时配置自己的项目与数据库，不复用原站点身份。
 

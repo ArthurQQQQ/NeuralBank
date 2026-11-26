@@ -544,6 +544,18 @@ dialog::backdrop { background:rgba(15,20,30,.38); backdrop-filter:blur(7px); -we
 .memory-branches p{font-size:16px;color:var(--label-secondary);line-height:1.8;margin:0 0 13px}
 .memory-branches .path-links button{min-height:44px;font-size:14px}
 .cat-attention{color:var(--accent)}.cat-memory{color:var(--violet)}.cat-graph{color:var(--accent)}
+.selection-filters{display:flex;flex-wrap:wrap;gap:16px;margin:7px 0 20px}
+.selection-filters label{display:flex;align-items:center;gap:10px;color:var(--label-secondary);font-size:13px}
+.selection-filters select{min-height:44px;max-width:100%;padding:8px 34px 8px 12px;border:1px solid var(--separator);border-radius:9px;background:var(--bg-elevated);color:var(--label-primary);font:inherit}
+.selection-tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+.selection-tags span{padding:6px 10px;border:1px solid var(--separator-subtle);border-radius:8px;background:var(--fill-secondary);color:var(--label-secondary);font-size:13px}
+.selection-mechanisms{margin:25px 0;padding-top:22px;border-top:1px solid var(--separator-subtle)}
+.selection-mechanisms p,.selection-note{font-size:14px;line-height:1.8;color:var(--label-secondary)}
+.selection-note{margin:24px 0 0}.selection-related{flex-wrap:wrap}.app-footer{flex-wrap:wrap}
+.cloud-login{display:grid;gap:17px;margin:24px 0}.cloud-login form{display:grid;gap:10px}.cloud-login label{font-size:14px;color:var(--label-secondary)}
+.cloud-login input{min-height:46px;width:100%;padding:10px 13px;border:1px solid var(--separator);border-radius:10px;color:var(--label-primary);background:var(--bg-elevated);font:inherit}
+.cloud-login input:disabled{opacity:.55}.cloud-login .button{width:100%;min-height:46px}.login-divider{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--label-tertiary)}
+.login-divider:before,.login-divider:after{content:"";flex:1;height:1px;background:var(--separator-subtle)}.login-message,.login-availability{font-size:13px;line-height:1.8;margin:0;color:var(--label-secondary)}
 .level-tag{display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0}
 .difficulty-bars{display:flex;align-items:flex-end;gap:2px;height:10px}
 .difficulty-bars i{width:3px;height:5px;display:block;border-radius:1px;background:var(--separator)}

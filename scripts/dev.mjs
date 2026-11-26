@@ -10,6 +10,8 @@ import { handleSubmissions } from '../server/submission-api.mjs';
 import { createLocalSubmissionStore } from '../server/submission-local-store.mjs';
 import { models } from '../src/models.js';
 import { benchmarks } from '../src/benchmarks.js';
+import { createPublicCatalogAssets } from './public-catalog-assets.mjs';
+import { readPublicAuthConfig, publicAuthConfigSource } from './public-auth-config.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = path.join(root, 'src');
@@ -17,6 +19,8 @@ const port = Number(process.env.NEURALBANK_PORT || 4173);
 const store = createLocalStore(path.join(root, '.local/contributions.json'));
 const submissionStore = createLocalSubmissionStore(path.join(root, '.local/submissions.json'));
 const submissionContext = { models, benchmarks };
+const publicCatalogAssets = createPublicCatalogAssets();
+const authConfigScript = publicAuthConfigSource(readPublicAuthConfig());
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json; charset=utf-8' };
 
 const server = http.createServer(async (incoming, outgoing) => {
@@ -38,6 +42,11 @@ const server = http.createServer(async (incoming, outgoing) => {
       else response = await handleContributions(request, store);
     } else if (!['GET', 'HEAD'].includes(incoming.method)) {
       response = new Response('Method not allowed', { status: 405, headers: { allow: 'GET, HEAD' } });
+    } else if (requestUrl.pathname === '/cloud-auth-config.js') {
+      response = new Response(incoming.method === 'HEAD' ? null : authConfigScript, { headers: { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-cache', 'x-content-type-options': 'nosniff' } });
+    } else if (Object.hasOwn(publicCatalogAssets, requestUrl.pathname.slice(1))) {
+      const asset = publicCatalogAssets[requestUrl.pathname.slice(1)];
+      response = new Response(incoming.method === 'HEAD' ? null : asset.body, { headers: { 'content-type': asset.type, 'cache-control': 'no-cache', 'x-content-type-options': 'nosniff' } });
     } else if (requestUrl.pathname === '/submission.schema.json') {
       try {
         response = new Response(incoming.method === 'HEAD' ? null : await readFile(path.join(root, 'schemas/submission.schema.json')), {

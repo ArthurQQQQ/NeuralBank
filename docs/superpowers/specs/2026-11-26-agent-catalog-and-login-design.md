@@ -1,0 +1,11 @@
+# Agent catalog and account login
+
+The user requested GitHub login plus institutional email login for universities globally, and a clear MCP interface through which other agents can classify, discover, compare, and select architectures.
+
+Keep the existing personal dashboard and stable model IDs. Add explicit multi-axis metadata for all 64 entries: tasks, mechanisms, modalities, outputs, traits, entry type, illustrative scope, use cases, tradeoffs, and related architectures. Family labels describe teaching mechanisms; task applicability is a selection clue, not a benchmark claim. Preserve original references and the existing 15 reported results. Never infer new scores or a universal ranking.
+
+One shared query engine serves an official-SDK stdio MCP package, public JSON exports, and website labels. Tools are read-only: list categories, search, inspect, compare, and suggest under stated constraints. Validate parameters, bound pagination, preserve negative constraints, and return reasons and limitations. MCP and public exports contain no account identity, mastery records, credentials, or executable submission actions. Publish machine-readable discovery and setup instructions alongside the static website; do not advertise a static URL as a running HTTP MCP server.
+
+The current public host is GitHub Pages. Retain it and use a separate Supabase Auth/Postgres backend for actual GitHub OAuth, verified institutional email codes, and account-isolated progress. Use the official browser SDK with PKCE, trusted user verification, server-enforced institutional eligibility, RLS, and revision-safe writes. GitHub identity or a verified email on an approved academic domain grants application access. Globally sourced domain data needs provenance and an update/import path; an edu suffix or client-provided profile field is not sufficient evidence.
+
+The original Sites project remains unavailable and must not be replaced or rebound. Cloud activation requires the owner's connected Supabase project, GitHub OAuth app configuration, and working public email delivery. Until configured, preserve guest learning and show truthful unavailable login status. Only public project settings may enter the website bundle; privileged keys and SMTP credentials remain in the provider's secure configuration.

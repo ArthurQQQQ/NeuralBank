@@ -5,20 +5,27 @@ import { loadLearned, matchesLearningStatus, summarizeLearning } from './learnin
 import { createLearningLibrary } from './learning-sync.js';
 import { tasks, benchmarks, benchmarkResults } from './benchmarks.js';
 import { initializeContributions } from './contribute.js';
+import { architectureMetadata, architectureAxes } from './architecture-metadata.js';
+import { createCloudAuth } from './cloud-auth.js';
+import { cloudAuthConfig } from './cloud-auth-config.js';
+import { createAccountLogin } from './account-login.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const escape = (value) => String(value ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 const categoryNames = Object.fromEntries(categories.map(category => [category.id, category.name]));
+const axisLabel = (axis, id) => architectureAxes[axis].find(item => item.id === id)?.label || id;
 const rank = id => difficulties.findIndex(level => level.id === id);
 const orderedModels = categories.flatMap(category => models.filter(model => model.category === category.id).sort((a,b) => rank(a.level) - rank(b.level) || category.order.indexOf(a.id) - category.order.indexOf(b.id)));
 const modelIds = new Set(models.map(model => model.id));
 let learningStorage = null;
 try { learningStorage = window.localStorage; learningStorage.getItem('neuralbank-learned'); } catch { learningStorage = null; }
+const cloudAuth = createCloudAuth({ config: cloudAuthConfig, storage: learningStorage, fetcher: window.fetch.bind(window), location: window.location });
+const accountLogin = createAccountLogin({ root: $('#account-content'), auth: cloudAuth, config: cloudAuthConfig, onRender: renderAccount, onSessionChange: () => learningLibrary.refresh() });
 const statuses = [{id:'all',name:'全部'},{id:'mastered',name:'已掌握'},{id:'unmastered',name:'未掌握'}];
 const venueKey = model => model.venue ? `${model.venue.name}:${model.venue.year}` : 'classic';
 const sourceOptions = [{id:'all',name:'全部来源'},{id:'classic',name:'基础图谱'},{id:'recent',name:'三会新架构'},...['ICLR','ICML','NeurIPS'].flatMap(name => [...new Set(models.filter(model => model.venue?.name === name).map(model => model.venue.year))].sort((a,b) => b-a).map(year => ({id:`${name}:${year}`,name:`${name} ${year}`})))];
-const state = { view:'learning',track:'foundations',task:'all',benchmarkQuery:'',category:'all',level:'all',venue:'all',mastery:'all',query:'',learned:loadLearned(learningStorage,modelIds),progressSaved:Boolean(learningStorage),model:null,tab:'structure',layer:0,quizAnswer:null };
+const state = { view:'learning',track:'foundations',task:'all',benchmarkQuery:'',category:'all',level:'all',architectureTask:'all',entityType:'all',venue:'all',mastery:'all',query:'',learned:loadLearned(learningStorage,modelIds),progressSaved:Boolean(learningStorage),model:null,tab:'structure',layer:0,quizAnswer:null };
 let diagramTimer = null;
 let toastTimer = null;
 let modelOpener = null;
@@ -83,7 +90,9 @@ function renderLevels() {
 
 function matchesSearch(model) {
   const query = state.query.toLocaleLowerCase().trim();
-  return `${model.name} ${model.fullName} ${model.tagline} ${model.description} ${model.problemSolved || ''} ${model.methodChange || ''} ${(model.limitations || []).join(' ')} ${model.venue?.name || ''} ${model.venue?.year || ''} ${categoryNames[model.category]} ${model.keyPoints.join(' ')} ${model.layers.map(layer => layer.label).join(' ')}`.toLocaleLowerCase().includes(query);
+  const metadata = architectureMetadata[model.id];
+  const selectionTerms = [...metadata.supportedTasks.map(id => axisLabel('tasks',id)), ...metadata.mechanisms.map(id => axisLabel('mechanisms',id)), ...metadata.representativeUseCases, ...metadata.traits.map(id => axisLabel('traits',id))].join(' ');
+  return `${model.name} ${model.fullName} ${model.tagline} ${model.description} ${model.problemSolved || ''} ${model.methodChange || ''} ${(model.limitations || []).join(' ')} ${model.venue?.name || ''} ${model.venue?.year || ''} ${categoryNames[model.category]} ${model.keyPoints.join(' ')} ${model.layers.map(layer => layer.label).join(' ')} ${selectionTerms}`.toLocaleLowerCase().includes(query);
 }
 function matchesSource(model,source) {
   return source === 'all' || (source === 'recent' ? Boolean(model.venue) : venueKey(model) === source);
@@ -93,6 +102,8 @@ function matchesFilters(model,ignore = '') {
     && (ignore === 'level' || state.level === 'all' || model.level === state.level)
     && (ignore === 'venue' || matchesSource(model,state.venue))
     && (ignore === 'mastery' || matchesLearningStatus(model.id,state.learned,state.mastery))
+    && (state.architectureTask === 'all' || architectureMetadata[model.id].supportedTasks.includes(state.architectureTask))
+    && (state.entityType === 'all' || architectureMetadata[model.id].entityType === state.entityType)
     && matchesSearch(model);
 }
 function publicationLabel(model) { return model.venue ? `${model.venue.name} ${model.venue.year}` : `${model.year} · 文献节点`; }
@@ -116,9 +127,13 @@ function renderCatalog() {
   const labels = [state.category === 'all' ? '全部类别' : categoryNames[state.category],state.level === 'all' ? '全部难度' : state.level];
   if (state.venue !== 'all') labels.push(sourceOptions.find(option => option.id === state.venue)?.name || '论文来源');
   if (state.mastery !== 'all') labels.push(statuses.find(status => status.id === state.mastery).name);
+  if (state.architectureTask !== 'all') labels.push(axisLabel('tasks',state.architectureTask));
+  if (state.entityType !== 'all') labels.push(axisLabel('entityTypes',state.entityType));
   $('#visible-models').textContent = `${labels.join(' · ')} · ${filtered.length} 个模型`;
   $('#empty-state').hidden = filtered.length !== 0;
-  $('#reset-filters').hidden = state.category === 'all' && state.level === 'all' && state.venue === 'all' && state.mastery === 'all' && !state.query;
+  $('#reset-filters').hidden = state.category === 'all' && state.level === 'all' && state.venue === 'all' && state.mastery === 'all' && state.architectureTask === 'all' && state.entityType === 'all' && !state.query;
+  $('#architecture-task').value = state.architectureTask;
+  $('#architecture-type').value = state.entityType;
   const facetGroups = [
     {selector:'.filter',field:'category',data:'category',predicate:(model,value) => value === 'all' || model.category === value},
     {selector:'.difficulty-filter',field:'level',data:'difficulty',predicate:(model,value) => value === 'all' || model.level === value},
@@ -166,6 +181,8 @@ function renderCategoryContext() {
 }
 
 function initializeCatalog() {
+  $('#architecture-task').innerHTML = '<option value="all">全部任务</option>' + architectureAxes.tasks.map(item => `<option value="${escape(item.id)}">${escape(item.label)}</option>`).join('');
+  $('#architecture-type').innerHTML = '<option value="all">全部条目</option>' + architectureAxes.entityTypes.map(item => `<option value="${escape(item.id)}">${escape(item.label)}</option>`).join('');
   $('#category-filters').innerHTML = [{id:'all',name:'全部架构'},...categories].map(category => `<button data-category="${category.id}" class="filter" aria-pressed="false">${category.name}<span data-count></span></button>`).join('');
   $('#difficulty-filters').innerHTML = [{id:'all',name:'全部'},...difficulties.map(level => ({id:level.id,name:level.id}))].map(level => `<button data-difficulty="${level.id}" class="difficulty-filter" aria-pressed="false">${level.name}<span data-count></span></button>`).join('');
   $('#venue-filters').innerHTML = sourceOptions.map(source => `<button data-venue="${source.id}" class="source-filter" aria-pressed="false">${source.name}<span data-count></span></button>`).join('');
@@ -174,13 +191,15 @@ function initializeCatalog() {
 }
 
 function resetFilters() {
-  state.category = 'all'; state.level = 'all'; state.venue = 'all'; state.mastery = 'all'; state.query = ''; $('#model-search').value = ''; renderCatalog();
+  state.category = 'all'; state.level = 'all'; state.venue = 'all'; state.mastery = 'all'; state.architectureTask = 'all'; state.entityType = 'all'; state.query = ''; $('#model-search').value = ''; renderCatalog();
 }
 function setFilter(category) { state.category = category; renderCatalog(); }
 $('.category-filters').addEventListener('click', event => { const button = event.target.closest('[data-category]'); if (button) setFilter(button.dataset.category); });
 $('#difficulty-filters').addEventListener('click', event => { const button = event.target.closest('[data-difficulty]'); if (button) { state.level = button.dataset.difficulty; renderCatalog(); } });
 $('#model-grid').addEventListener('click', event => { const button = event.target.closest('[data-browse-family]'); if (button) { setFilter(button.dataset.browseFamily); $('#models').scrollIntoView({block:'start',behavior:scrollBehavior()}); $(`[data-category="${button.dataset.browseFamily}"]`).focus({preventScroll:true}); } });
-$('#explore-memory').addEventListener('click', () => { state.level = 'all'; state.venue = 'all'; state.mastery = 'all'; state.query = ''; $('#model-search').value = ''; setFilter('memory'); });
+$('#explore-memory').addEventListener('click', () => { resetFilters(); setFilter('memory'); });
+$('#architecture-task').addEventListener('change', event => { state.architectureTask = event.target.value; renderCatalog(); });
+$('#architecture-type').addEventListener('change', event => { state.entityType = event.target.value; renderCatalog(); });
 $('#explore-recent').addEventListener('click',() => { resetFilters(); state.venue = 'recent'; renderCatalog(); });
 $('#venue-filters').addEventListener('click',event => { const button = event.target.closest('[data-venue]'); if (button) { state.venue = button.dataset.venue; renderCatalog(); } });
 $('#mastery-filters').addEventListener('click',event => { const button = event.target.closest('[data-mastery]'); if (button) { state.mastery = button.dataset.mastery; renderCatalog(); } });
@@ -249,7 +268,7 @@ function openModel(id,initialTab) {
 function renderDetail() {
   const model = state.model;
   const mastered = state.learned.has(model.id);
-  $('#model-detail').innerHTML = `<div class="detail-header"><div><div class="detail-eyebrow"><span>${categoryNames[model.category]}</span><span>${model.level}</span></div><h2 id="model-title">${escape(model.name)}</h2><p class="detail-subtitle">${escape(model.fullName)} · ${escape(publicationLabel(model))}</p>${model.venue ? `<a class="detail-paper-link" href="${escape(model.venue.url)}" target="_blank" rel="noopener noreferrer">${escape(model.venue.name)} ${model.venue.year} · 正式论文</a>` : ''}</div><div class="detail-header-actions"><button class="text-button" data-edit-model="${model.id}">建议编辑</button><button class="icon-button" data-close="model-dialog" aria-label="关闭模型详情">×</button></div></div><div class="model-learning-context"><p>${escape(model.learningGoal || model.tagline)}</p><div class="prerequisite-links"><span>建议先学</span>${(model.prerequisites || []).length ? model.prerequisites.map(id => { const prerequisite = models.find(item => item.id === id); return prerequisite ? `<button data-open="${id}">${escape(prerequisite.name)}</button>` : ''; }).join('') : '<span class="no-prerequisite">可作为学习起点</span>'}</div></div><div class="detail-tabs" role="tablist" aria-label="模型学习内容">${[...(model.venue ? [['problem','问题与局限']] : []),['structure','结构拆解'],['principles','核心原理'],['quiz','考点自测'],['scores','Benchmarks']].map(([id,label]) => `<button role="tab" id="tab-${id}" data-tab="${id}" aria-selected="${state.tab === id}" aria-controls="detail-tabpanel" tabindex="${state.tab === id ? '0' : '-1'}">${label}</button>`).join('')}</div><div class="detail-body" id="detail-tabpanel" role="tabpanel" aria-labelledby="tab-${state.tab}"></div><div class="detail-footer"><p class="detail-storage-label">${escape(storageLabel())}</p><button class="button ${mastered ? 'mastered-button' : 'secondary'}" id="toggle-mastered" aria-pressed="${mastered}">${mastered ? '✓ 已掌握 · 标记为未掌握' : '标记为已掌握'}</button></div>`;
+  $('#model-detail').innerHTML = `<div class="detail-header"><div><div class="detail-eyebrow"><span>${categoryNames[model.category]}</span><span>${model.level}</span></div><h2 id="model-title">${escape(model.name)}</h2><p class="detail-subtitle">${escape(model.fullName)} · ${escape(publicationLabel(model))}</p>${model.venue ? `<a class="detail-paper-link" href="${escape(model.venue.url)}" target="_blank" rel="noopener noreferrer">${escape(model.venue.name)} ${model.venue.year} · 正式论文</a>` : ''}</div><div class="detail-header-actions"><button class="text-button" data-edit-model="${model.id}">建议编辑</button><button class="icon-button" data-close="model-dialog" aria-label="关闭模型详情">×</button></div></div><div class="model-learning-context"><p>${escape(model.learningGoal || model.tagline)}</p><div class="prerequisite-links"><span>建议先学</span>${(model.prerequisites || []).length ? model.prerequisites.map(id => { const prerequisite = models.find(item => item.id === id); return prerequisite ? `<button data-open="${id}">${escape(prerequisite.name)}</button>` : ''; }).join('') : '<span class="no-prerequisite">可作为学习起点</span>'}</div></div><div class="detail-tabs" role="tablist" aria-label="模型学习内容">${[...(model.venue ? [['problem','问题与局限']] : []),['structure','结构拆解'],['principles','核心原理'],['selection','选型参考'],['quiz','考点自测'],['scores','Benchmarks']].map(([id,label]) => `<button role="tab" id="tab-${id}" data-tab="${id}" aria-selected="${state.tab === id}" aria-controls="detail-tabpanel" tabindex="${state.tab === id ? '0' : '-1'}">${label}</button>`).join('')}</div><div class="detail-body" id="detail-tabpanel" role="tabpanel" aria-labelledby="tab-${state.tab}"></div><div class="detail-footer"><p class="detail-storage-label">${escape(storageLabel())}</p><button class="button ${mastered ? 'mastered-button' : 'secondary'}" id="toggle-mastered" aria-pressed="${mastered}">${mastered ? '✓ 已掌握 · 标记为未掌握' : '标记为已掌握'}</button></div>`;
   renderDetailBody();
 }
 
@@ -264,6 +283,9 @@ function renderDetailBody() {
     renderInspector();
   } else if (state.tab === 'principles') {
     body.innerHTML = `<p class="detail-intro">${escape(model.description)}</p><div class="principle-grid"><div><h3>三个核心要点</h3><ul>${model.keyPoints.map(point => `<li>${escape(point)}</li>`).join('')}</ul></div><aside class="pitfall"><h3>容易踩的坑</h3><p>${escape(model.pitfall)}</p></aside></div><div class="formula-box"><h3>核心公式</h3><p class="formula">${escape(model.formula)}</p><p class="formula-explanation">${escape(model.formulaExplanation)}</p></div><div class="references"><h3>回到原始资料</h3>${model.references.map(reference => `<a href="${escape(reference.url)}" target="_blank" rel="noopener noreferrer">${escape(reference.label)}</a>`).join('')}</div>`;
+  } else if (state.tab === 'selection') {
+    const metadata = architectureMetadata[model.id];
+    body.innerHTML = `<p class="detail-intro">${escape(metadata.scopeNote)}</p><div class="selection-tags"><span>${escape(axisLabel('entityTypes',metadata.entityType))}</span>${metadata.supportedTasks.map(id => `<span>${escape(axisLabel('tasks',id))}</span>`).join('')}${metadata.traits.map(id => `<span>${escape(axisLabel('traits',id))}</span>`).join('')}</div><div class="principle-grid"><div><h3>可以从这些用途切入</h3><ul>${metadata.representativeUseCases.map(value => `<li>${escape(value)}</li>`).join('')}</ul></div><aside class="pitfall"><h3>选择时的取舍</h3><ul>${metadata.tradeoffs.map(value => `<li>${escape(value)}</li>`).join('')}</ul></aside></div><div class="selection-mechanisms"><h3>核心机制</h3><p>${metadata.mechanisms.map(id => escape(axisLabel('mechanisms',id))).join(' · ')}</p><p>${escape(metadata.teachingScope)}</p></div><div class="prerequisite-links selection-related"><span>对照阅读</span>${metadata.relatedModelIds.map(id => `<button data-open="${id}">${escape(models.find(item => item.id === id).name)}</button>`).join('')}</div><p class="selection-note">适用任务是选型线索，具体效果需要结合数据、训练配置与相同协议下的成绩判断。</p>`;
   } else if (state.tab === 'scores') {
     const results = benchmarkResults.filter(result => result.modelId === model.id);
     body.innerHTML = `<div class="model-score-heading"><p class="score-context">以下为论文报告的具体模型配置，结构图为教学示意。</p><button class="button secondary" data-report-model="${model.id}" data-open-contribution="benchmark-result">上报我的成绩</button></div>${results.length ? results.map(scoreCard).join('') : '<div class="score-empty"><h3>还没有收录可比成绩</h3><p>该条目是架构或模块，不对应一份固定训练配置。后续可补充有明确评测条件的论文结果。</p></div>'}`;
@@ -382,7 +404,11 @@ function renderAccount() {
   const importCount = [...loadLearned(learningStorage,modelIds)].filter(id => !snapshot.learned.has(id)).length;
   $('#account-label').textContent = session.authenticated ? session.user.displayName || '我的账户' : '我的学习库';
   if (!$('#account-dialog').open) return;
-  $('#account-content').innerHTML = session.authenticated ? `<div class="account-profile"><span class="account-avatar" aria-hidden="true">${escape((session.user.displayName || session.user.email || '我').slice(0,1))}</span><div><h3>${escape(session.user.displayName || '我的账户')}</h3><p>${escape(session.user.email || '')}</p></div></div><p class="account-status">${escape(storageLabel())}</p>${snapshot.status === 'error' ? `<p class="account-error" role="alert">${escape(snapshot.error || '同步暂未完成，更改已保留。')}</p><button class="button secondary" id="retry-learning">重新同步</button>` : ''}${importCount ? `<div class="import-panel"><h3>此浏览器还有 ${importCount} 项访客标注</h3><p>合并后会保留账户已掌握的模型。</p><button class="button secondary" id="import-learning">合并到我的学习库</button></div>` : ''}<a class="text-button account-signout" href="${escape(session.signOutUrl)}" target="_top">退出登录</a>` : `<div class="account-intro"><h3>${session.authAvailable ? '登录你的学习库' : '本地学习库'}</h3><p>${session.authAvailable ? '登录后，在不同设备上继续自己的学习进度。' : staticPublication ? '公开版的学习进度保存在此浏览器。你可以直接学习；账户同步由服务器版提供。' : '你的掌握标注会保存在此浏览器。云端登录将在托管站点恢复后启用。'}</p>${session.authAvailable && session.signInUrl ? `<a class="button primary" href="${escape(session.signInUrl)}" target="_top">使用 ChatGPT 登录</a>` : ''}<span class="account-local-count">此浏览器已掌握 ${state.learned.size} / ${models.length} 个模型</span></div>`;
+  if (!session.authenticated && (cloudAuth.configured || !session.authAvailable)) {
+    $('#account-content').innerHTML = accountLogin.markup({ mastered: state.learned.size, total: models.length });
+    return;
+  }
+  $('#account-content').innerHTML = session.authenticated ? `<div class="account-profile"><span class="account-avatar" aria-hidden="true">${escape((session.user.displayName || session.user.email || '我').slice(0,1))}</span><div><h3>${escape(session.user.displayName || '我的账户')}</h3><p>${escape(session.user.email || '')}</p></div></div><p class="account-status">${escape(storageLabel())}</p>${snapshot.status === 'error' ? `<p class="account-error" role="alert">${escape(snapshot.error || '同步暂未完成，更改已保留。')}</p><button class="button secondary" id="retry-learning">重新同步</button>` : ''}${importCount ? `<div class="import-panel"><h3>此浏览器还有 ${importCount} 项访客标注</h3><p>合并后会保留账户已掌握的模型。</p><button class="button secondary" id="import-learning">合并到我的学习库</button></div>` : ''}${cloudAuth.configured ? '<button class="text-button account-signout" id="cloud-signout" type="button">退出登录</button>' : `<a class="text-button account-signout" href="${escape(session.signOutUrl)}" target="_top">退出登录</a>`}` : `<div class="account-intro"><h3>${session.authAvailable ? '登录你的学习库' : '本地学习库'}</h3><p>${session.authAvailable ? '登录后，在不同设备上继续自己的学习进度。' : staticPublication ? '公开版的学习进度保存在此浏览器。你可以直接学习；账户同步由服务器版提供。' : '你的掌握标注会保存在此浏览器。云端登录将在托管站点恢复后启用。'}</p>${session.authAvailable && session.signInUrl ? `<a class="button primary" href="${escape(session.signInUrl)}" target="_top">使用 ChatGPT 登录</a>` : ''}<span class="account-local-count">此浏览器已掌握 ${state.learned.size} / ${models.length} 个模型</span></div>`;
 }
 $('#account-button').addEventListener('click',() => { showDialog('account-dialog'); renderAccount(); });
 $('#account-content').addEventListener('click',event => { if (event.target.closest('#import-learning')) learningLibrary.importGuest(); if (event.target.closest('#retry-learning')) learningLibrary.retry(); });
@@ -433,9 +459,10 @@ window.addEventListener('hashchange',() => {
 window.addEventListener('popstate',() => { if (!location.hash.startsWith('#model/')) navigate(location.hash.slice(1),true); });
 initializeCatalog(); updateProgress(); renderCatalog(); renderBenchmarks();
 contributionUI=initializeContributions({models,benchmarks,getSession:()=>librarySnapshot?.session,navigate,notify:toast,staticMode:staticPublication});
-learningLibrary = createLearningLibrary({storage:learningStorage,validIds:modelIds,fetcher:staticPublication ? async () => new Response(JSON.stringify({authAvailable:false,authenticated:false,user:null,signInUrl:null,signOutUrl:null}),{headers:{'content-type':'application/json'}}) : window.fetch.bind(window),onChange:onLearningChange});
+learningLibrary = createLearningLibrary({storage:learningStorage,validIds:modelIds,fetcher:cloudAuth.configured ? cloudAuth.learningFetcher : staticPublication ? async () => new Response(JSON.stringify({authAvailable:false,authenticated:false,user:null,signInUrl:null,signOutUrl:null}),{headers:{'content-type':'application/json'}}) : window.fetch.bind(window),onChange:onLearningChange});
 librarySnapshot = learningLibrary.getSnapshot();
 learningLibrary.initialize();
+cloudAuth.subscribe(() => { queueMicrotask(() => { void learningLibrary.refresh(); }); });
 window.addEventListener('focus',() => { if (document.visibilityState === 'visible') void learningLibrary.refresh(); });
 const initialHash = location.hash;
 navigate(initialHash.startsWith('#model/') ? 'learning' : initialHash.slice(1),true);

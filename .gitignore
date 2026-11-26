@@ -7,3 +7,6 @@ node_modules/
 .openai/*.json.tmp
 
 dist-static/
+.env
+.env.*
+!.env.example

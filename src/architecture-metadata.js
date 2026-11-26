@@ -1,0 +1,162 @@
+// Multi-axis discovery metadata for the exact teaching configurations in models.js.
+// Task hints are not benchmark certifications; no runtime/model code is executed.
+// The query layer attaches sources directly from each existing model.references.
+const axis = entries => Object.entries(entries).map(([id, label]) => ({ id, label }));
+
+export const architectureAxes = {
+  tasks: axis({
+    language: '语言与文本', vision: '图像与视觉', 'time-series': '时间序列', graph: '图与关系',
+    tabular: '表格与数值特征', 'associative-memory': '联想记忆', audio: '音频与波形',
+    'algorithmic-sequence': '算法式序列任务', 'density-estimation': '连续密度估计',
+    'scientific-computing': '函数拟合与科学计算'
+  }),
+  entityTypes: [
+    { id: 'family', label: '架构家族', description: '存在不同规模或变体；教学图只选择其中一个配置。' },
+    { id: 'model', label: '具体模型', description: '此条采用一个明确模型或历史原型，尺寸仍可能缩略。' },
+    { id: 'block', label: '构建模块', description: '子层、单元或可插入模块，需配合完整网络与任务头。' },
+    { id: 'framework', label: '训练或建模框架', description: '规定训练关系、目标或组合流程，不唯一确定网络拓扑。' }
+  ],
+  mechanisms: axis({
+    'linear-threshold': '线性阈值', 'dense-feedforward': '全连接前馈', 'radial-basis': '径向基函数',
+    'bipartite-energy': '二部能量模型', 'hybrid-belief-network': '混合有向/无向信念网络', 'spline-edge-functions': '样条边函数',
+    'spatial-convolution': '空间卷积', pooling: '空间汇聚', 'residual-addition': '残差相加',
+    'dense-concatenation': '跨层特征拼接', 'multi-branch-convolution': '多尺度并行卷积',
+    'depthwise-convolution': '逐通道卷积', 'pointwise-convolution': '点式通道混合', 'channel-gating': '通道门控', 'compound-scaling': '复合缩放设计',
+    'recurrent-state': '循环状态', 'gated-recurrence': '门控循环', 'structured-state-space': '结构化状态空间',
+    'selective-state-space': '选择性状态空间', 'causal-convolution': '因果卷积', 'dilated-convolution': '膨胀卷积',
+    'self-attention': '自注意力', 'causal-attention': '因果注意力', 'cross-attention': '交叉注意力',
+    'window-attention': '窗口注意力', 'shifted-windows': '移位窗口', 'kernel-attention': '核化注意力',
+    'random-features': '随机特征近似', retention: '衰减保留机制', 'temporal-decay': '时间衰减', 'token-shift': '前态插值移位',
+    'attractor-dynamics': '吸引子状态更新', 'continuous-association': '连续内容关联',
+    'external-memory-read': '外部记忆读取', 'external-memory-write': '外部记忆写入', 'content-addressing': '内容寻址',
+    'location-addressing': '位置寻址', 'dynamic-memory-allocation': '动态记忆分配', 'temporal-memory-links': '写入时序链接',
+    'fast-weight-learning': '快权重更新', 'sliding-window-attention': '滑窗注意力', 'compressed-memory': '压缩历史记忆',
+    'multiscale-memory': '多尺度记忆桶', autoencoding: '编码与重建', 'variational-inference': '变分推断',
+    reparameterization: '重参数化采样', 'adversarial-learning': '对抗训练', 'vector-quantization': '向量量化',
+    'normalizing-flow': '可逆流', 'affine-coupling': '仿射耦合', 'diffusion-denoising': '扩散去噪',
+    'latent-diffusion': '潜空间去噪生成', 'conditional-normalization': '条件归一化',
+    'pretrained-representation': '预训练表征编码', 'latent-compression': '潜表示压缩', 'image-refinement': '图像细化',
+    'graph-message-passing': '图消息传递', 'neighbor-sampling': '邻居采样', 'neighborhood-attention': '邻域注意力',
+    'sum-aggregation': '多重集求和', 'backcast-forecast': '回溯残差与预测累加', 'variable-selection': '变量选择',
+    'quantile-regression': '分位数回归', 'channel-independent-attention': '逐变量独立注意力',
+    'variable-attention': '变量间注意力', 'function-basis-decoder': '函数基解码',
+    'multi-hop-attention': '多跳记忆读取', 'segment-memory': '片段隐藏态缓存', 'relative-position': '相对位置信息'
+  }),
+  inputModalities: axis({
+    'feature-vector': '数值特征向量', image: '图像/空间特征', text: '文本token/嵌入',
+    'numeric-sequence': '数值时间序列', 'symbolic-sequence': '符号序列', audio: '离散音频波形',
+    graph: '图边与节点特征', 'binary-pattern': '二值模式', 'pattern-set': '模式集合与查询',
+    'fact-set': '事实集合与问题', 'noise-vector': '随机噪声向量', 'noise-grid': '随机噪声网格',
+    'latent-grid': '潜空间网格', 'latent-vector': '潜变量向量', 'known-covariates': '未来已知协变量'
+  }),
+  outputTypes: axis({
+    'class-label': '类别标签', 'class-probabilities': '类别概率', 'feature-representation': '特征表示',
+    'continuous-regression': '连续回归值', 'point-forecast': '未来点预测', 'quantile-forecast': '未来分位数',
+    reconstruction: '输入重建', 'generated-image': '生成图像', 'generated-audio': '下一音频采样分布',
+    'token-distribution': '词表分布', 'token-logits': '词表logits', 'generated-token': '生成的下一token',
+    'latent-code': '潜表示/码字', energy: '能量分数', density: '连续对数密度',
+    'retrieved-pattern': '检索模式', 'memory-readout': '记忆读出', 'node-probabilities': '节点类别概率',
+    'graph-probabilities': '图类别概率', 'answer-probabilities': '候选答案概率',
+    'noise-prediction': '噪声预测', 'variance-parameters': '反向过程方差参数'
+  }),
+  traits: axis({
+    feedforward: '前馈', causal: '按序列因果读取', bidirectional: '双向上下文', 'encoder-only': '仅编码器',
+    'decoder-only': '仅解码器', 'encoder-decoder': '编码器—解码器', recurrent: '循环递推',
+    'fixed-size-state': '相对序列长度固定的状态', 'growing-memory': '随历史增长的记忆',
+    'local-receptive-field': '局部感受范围', hierarchical: '分层多尺度', 'multi-scale': '多尺度组合',
+    'skip-connections': '跳跃连接', 'channel-independent': '通道独立处理', 'shared-channel-weights': '跨变量共享权重',
+    'variable-interactions': '显式变量交互', 'latent-bottleneck': '潜变量瓶颈', 'continuous-latent': '连续潜变量',
+    'discrete-latent': '离散潜变量', stochastic: '随机变量/采样', 'iterative-sampling': '迭代采样',
+    'external-memory': '可读写外部记忆', 'read-only-memory': '查询时只读事实/模式',
+    'test-time-weight-update': '推理时更新指定快权重', 'content-addressed': '按内容检索', 'multi-hop': '多跳查询',
+    'permutation-equivariant': '节点重排等变', 'permutation-invariant-readout': '图读出对节点重排不变', 'inductive-node-functions': '共享归纳节点函数',
+    'exact-continuous-density': '可计算连续密度', 'dimension-preserving': '可逆映射保持维度',
+    'known-future-covariates': '输入未来已知协变量', 'quantile-output': '输出分位数',
+    'non-causal-history-encoder': '完整历史窗口编码（非自回归）', 'frozen-encoder': '冻结表征编码器',
+    'pretrained-components': '使用预训练组件', 'single-step-generator': '一次生成器前向生成',
+    'classification-head': '示例包含分类头', 'reconstruction-only': '此路径仅重建',
+    'binary-state': '二值状态', 'continuous-state': '连续状态', 'fixed-weight-retrieval': '检索时固定权重',
+    undirected: '无向联合模型', 'hybrid-directed-undirected': '混合有向与无向',
+    'requires-latent-prior': '从零生成另需潜先验', 'approximate-attention': '近似注意力核'
+  })
+};
+
+export const architectureMetadataScope = {
+  supportedTasks: '任务是文献和代表性用途的选型线索，不表示当前教学实例已训练、已验证或适合全部子任务。',
+  configuration: 'mechanisms、inputModalities、outputTypes与traits描述本页明确选择的教学配置；其他变体可能不同。',
+  evidence: '来源沿用每条model.references；结构标签不能代替同条件实验、复现或性能比较。',
+  absence: '未标注的属性不是反证；exclude约束只排除显式标注项，不能据此保证不存在未标注的机制或成本。'
+};
+
+const m = (entityType, teachingScope, supportedTasks, mechanisms, inputModalities, outputTypes, traits, representativeUseCases, tradeoffs, relatedModelIds, scopeNote = '') => ({
+  entityType, teachingScope, supportedTasks, mechanisms, inputModalities, outputTypes, traits,
+  representativeUseCases, tradeoffs, relatedModelIds,
+  scopeNote: scopeNote || '本条属性描述当前教学配置；任务只提供架构选型线索。'
+});
+
+export const architectureMetadata = {
+  perceptron: m('model', 'single-unit', ['tabular'], ['linear-threshold'], ['feature-vector'], ['class-label'], ['feedforward'], ['解释线性二分类边界与误分类更新。'], ['仅表达线性可分边界，阶跃输出不是概率。'], ['mlp', 'rbf']),
+  mlp: m('family', 'small-model', ['tabular'], ['dense-feedforward'], ['feature-vector'], ['class-probabilities'], ['feedforward', 'classification-head'], ['为固定维度特征构建基础分类器。'], ['依赖特征与非线性设计；本例没有空间、图或时间结构归纳偏置。'], ['perceptron', 'rbf', 'kan']),
+  cnn: m('family', 'small-model', ['vision'], ['spatial-convolution', 'pooling'], ['image'], ['class-probabilities'], ['feedforward', 'local-receptive-field', 'classification-head'], ['学习局部空间模式并进行图像分类。'], ['步长与边界影响等变性；有限感受范围不等于全局不变。'], ['lenet', 'vgg', 'vit']),
+  rnn: m('family', 'small-model', ['time-series', 'language'], ['recurrent-state'], ['numeric-sequence'], ['class-probabilities'], ['causal', 'recurrent', 'fixed-size-state'], ['对序列逐步分类，研究共享状态如何传递历史。'], ['长链优化可能出现梯度消失/爆炸；固定状态压缩历史。'], ['lstm', 'gru', 's4'], '此图是单向数值输入RNN；语言用途需要相应token表示和任务头。'),
+  lstm: m('block', 'core-block', ['time-series', 'language'], ['gated-recurrence'], ['numeric-sequence'], ['feature-representation'], ['causal', 'recurrent', 'fixed-size-state'], ['用细胞状态与门控建模顺序依赖。'], ['门控不能保证任意长期记忆；需要任务头才能得到分类或预测。'], ['rnn', 'gru', 'ntm']),
+  transformer: m('family', 'core-block', ['language'], ['self-attention', 'dense-feedforward', 'residual-addition'], ['text'], ['feature-representation'], ['bidirectional', 'encoder-only', 'skip-connections'], ['比较全局上下文交互与逐位置前馈。'], ['此页是双向编码块，不能直接当作因果生成器；稠密注意力保存两两关系。'], ['bert', 'gpt', 't5', 'performer'], 'Transformer家族不只有encoder；本页traits专指已绘出的双向编码器块。'),
+  autoencoder: m('family', 'small-model', ['vision', 'tabular'], ['autoencoding', 'latent-compression'], ['image'], ['reconstruction', 'latent-code'], ['encoder-decoder', 'latent-bottleneck', 'continuous-latent', 'reconstruction-only'], ['学习欠完备压缩表示，检查重建瓶颈。'], ['普通AE没有规定可从中采样的合理潜先验；低重建误差不保证适合生成。'], ['vae', 'vqvae', 'rae']),
+  resnet: m('family', 'core-block', ['vision'], ['spatial-convolution', 'residual-addition'], ['image'], ['feature-representation'], ['feedforward', 'skip-connections', 'local-receptive-field'], ['以同形状BasicBlock观察残差学习与梯度路径。'], ['单块不是完整分类器；下采样和通道变化需要相应捷径。'], ['densenet', 'mobilenet-v2', 'convnext']),
+  gru: m('block', 'small-model', ['language', 'time-series'], ['gated-recurrence'], ['numeric-sequence'], ['class-probabilities'], ['causal', 'recurrent', 'fixed-size-state', 'classification-head'], ['比较单隐藏状态的更新门与重置门。'], ['reset-before/after与更新门约定需要对齐；门控不保证任意长精确检索。'], ['lstm', 'rnn', 'rwkv']),
+  unet: m('family', 'small-model', ['vision'], ['spatial-convolution', 'dense-concatenation'], ['image'], ['class-probabilities'], ['encoder-decoder', 'skip-connections', 'hierarchical'], ['用编码上下文与高分辨率跳连做像素分类。'], ['当前是same-padding的缩略分割器，不是原论文valid卷积几何；跳连增大特征存储。'], ['cnn', 'resnet', 'latent-diffusion']),
+  vit: m('family', 'small-model', ['vision'], ['self-attention', 'dense-feedforward'], ['image'], ['class-probabilities'], ['bidirectional', 'encoder-only', 'classification-head'], ['把图像patch序列交给全局encoder进行分类。'], ['patch尺寸决定序列长度；教学尺寸不支持推断完整ViT的性能。'], ['swin', 'cnn', 'dit']),
+  vae: m('framework', 'small-model', ['vision', 'density-estimation'], ['variational-inference', 'reparameterization', 'autoencoding'], ['image', 'latent-vector'], ['reconstruction', 'generated-image', 'latent-code'], ['encoder-decoder', 'continuous-latent', 'latent-bottleneck', 'stochastic'], ['用近似后验、先验与解码分布学习潜变量生成。'], ['优化的是变分界而非一般精确似然；重建与先验约束存在取舍。'], ['autoencoder', 'vqvae', 'realnvp'], 'VAE是概率建模/训练框架，本页选择对角高斯后验与Bernoulli解码器；不是唯一拓扑。'),
+  gan: m('framework', 'training-and-generation-workflow', ['vision'], ['adversarial-learning', 'dense-feedforward'], ['noise-vector', 'image'], ['generated-image', 'class-probabilities'], ['single-step-generator'], ['联合训练噪声生成器与共享真伪判别器。'], ['对抗优化可能不稳定或模式坍塌；判别概率不是整个生成分布的显式密度。'], ['vae', 'ddpm', 'realnvp'], 'GAN规定训练参与者与目标，本页G/D采用小MLP；生成阶段通常只用G。'),
+  hopfield: m('model', 'memory-retrieval', ['associative-memory'], ['attractor-dynamics'], ['binary-pattern'], ['retrieved-pattern', 'energy'], ['binary-state', 'recurrent', 'fixed-weight-retrieval'], ['从带噪二值线索迭代找回稳定模式。'], ['稳定点可能是伪记忆；能量下降依赖本页对称权重、异步更新与零场不变规则。'], ['modern-hopfield', 'rbm']),
+  'modern-hopfield': m('family', 'memory-retrieval', ['associative-memory'], ['continuous-association', 'content-addressing'], ['pattern-set'], ['memory-readout'], ['continuous-state', 'content-addressed', 'read-only-memory'], ['以内容相似度读出连续模式或模式混合。'], ['当前tied-pattern形式的能量解释不等于所有Transformer都有相同保证。'], ['hopfield', 'transformer', 'memn2n']),
+  ntm: m('model', 'core-block', ['algorithmic-sequence'], ['external-memory-read', 'external-memory-write', 'content-addressing', 'location-addressing'], ['symbolic-sequence'], ['continuous-regression'], ['causal', 'recurrent', 'external-memory'], ['用可微寻址学习复制等需要读写工作记忆的序列任务。'], ['软寻址增加状态与训练难度；图中控制器、读写头和矩阵不能当成普通五层MLP。'], ['dnc', 'lstm', 'memn2n']),
+  dnc: m('model', 'core-block', ['algorithmic-sequence', 'graph'], ['external-memory-read', 'external-memory-write', 'dynamic-memory-allocation', 'temporal-memory-links'], ['symbolic-sequence'], ['continuous-regression'], ['causal', 'recurrent', 'external-memory'], ['用分配和时序链接组织可读写记忆，处理关系的序列化表示。'], ['图用途是序列化关系推理，不是GNN消息传递；可微读写仍不保证可靠算法泛化。'], ['ntm', 'memn2n', 'gcn']),
+  'log-linear-attention': m('block', 'core-block', ['language'], ['kernel-attention', 'multiscale-memory', 'compressed-memory'], ['text'], ['memory-readout'], ['causal', 'multi-scale', 'growing-memory'], ['把前缀组织成多尺度压缩桶，再由query读取。'], ['桶内信息仍有损；状态与工作量按活跃尺度增长，不属于单一固定大小状态。'], ['performer', 'retnet', 'ahn']),
+  mamba3: m('family', 'core-block', ['language'], ['selective-state-space', 'recurrent-state'], ['text'], ['feature-representation'], ['causal', 'recurrent', 'fixed-size-state'], ['比较改进离散化、旋转状态与SISO序列读出。'], ['本图不包含可选MIMO；固定状态不能无损替代完整历史KV。'], ['mamba', 's4', 'retnet']),
+  rae: m('framework', 'training-and-generation-workflow', ['vision'], ['pretrained-representation', 'autoencoding', 'latent-diffusion'], ['image', 'noise-grid'], ['reconstruction', 'generated-image'], ['encoder-decoder', 'frozen-encoder', 'pretrained-components', 'iterative-sampling'], ['冻结视觉表征编码器，学习解码器并在表征潜空间生成。'], ['高维latent需要匹配的去噪器；冻结编码器不等于整个系统无需训练。'], ['autoencoder', 'latent-diffusion', 'repack-refine']),
+  titans: m('family', 'core-block', ['language'], ['sliding-window-attention', 'fast-weight-learning', 'compressed-memory'], ['text'], ['feature-representation'], ['causal', 'test-time-weight-update', 'fixed-size-state'], ['将短窗注意力、持久前缀与神经长时记忆进行MAG融合。'], ['推理时只更新指定快权重；MAG不等于MAC/MAL，有限记忆不保证永久无损检索。'], ['ahn', 'ntm', 'transformer-xl']),
+  'gated-attention': m('block', 'core-block', ['language'], ['causal-attention', 'channel-gating'], ['text'], ['feature-representation'], ['causal', 'growing-memory'], ['在各头SDPA输出后加入输入依赖sigmoid门。'], ['保留稠密softmax注意力与KV缓存；近零门不自动产生硬稀疏或加速。'], ['transformer', 'gpt', 'retnet'], 'growing-memory指未截断前缀的KV缓存随前缀增长，不表示可以使用无限上下文。'),
+  'canon-layer': m('block', 'core-block', ['language'], ['causal-convolution', 'residual-addition'], ['text'], ['feature-representation'], ['causal', 'local-receptive-field', 'skip-connections'], ['在Canon-A位置加入局部邻域残差混合。'], ['本页只是一个插入位置；局部卷积不代表任意长距离检索。'], ['tcn', 'gated-attention', 'mamba']),
+  ahn: m('framework', 'core-block', ['language'], ['sliding-window-attention', 'compressed-memory', 'gated-recurrence'], ['text'], ['memory-readout'], ['causal', 'fixed-size-state'], ['为已有Transformer保留滑窗KV，并用AHN-GDN压缩窗外历史。'], ['长期模块可有多种实例；当前GDN状态压缩不等于无损精确召回。'], ['titans', 'transformer-xl', 'retnet'], 'AHN是记忆增强框架；traits描述本页的固定滑窗+GDN示意，不保证其他替代模块同样。'),
+  flowstate: m('family', 'small-model', ['time-series'], ['structured-state-space', 'function-basis-decoder'], ['numeric-sequence'], ['point-forecast'], ['channel-independent', 'fixed-size-state'], ['以连续函数基解码，在指定预测时间点读取输出。'], ['此页是单变量读出，不表示原生跨变量交互；采样率等变性有理论条件。'], ['s4', 'nbeats', 'patchtst']),
+  'repack-refine': m('framework', 'training-and-generation-workflow', ['vision'], ['pretrained-representation', 'latent-compression', 'latent-diffusion', 'image-refinement'], ['image', 'noise-grid'], ['generated-image'], ['pretrained-components', 'iterative-sampling', 'encoder-decoder'], ['压缩视觉表征后训练生成器，再用latent引导图像细化。'], ['RePack、生成器和Refiner分阶段训练；Refiner增加成本且不是通用latent增强器。'], ['rae', 'dit', 'latent-diffusion']),
+  rbf: m('family', 'small-model', ['tabular', 'scientific-computing'], ['radial-basis'], ['feature-vector'], ['continuous-regression'], ['feedforward'], ['用距离中心的局部响应拟合连续函数。'], ['中心与宽度影响覆盖；维数升高时局部基的选择可能困难。'], ['mlp', 'kan', 'perceptron']),
+  rbm: m('model', 'probabilistic-graph', ['tabular', 'vision'], ['bipartite-energy'], ['binary-pattern'], ['energy', 'reconstruction', 'latent-code'], ['undirected', 'stochastic', 'iterative-sampling', 'binary-state'], ['在二值可见与隐藏层间交替采样并学习联合能量。'], ['有限步CD通常不等于精确似然梯度；重构质量不能代替密度评估。'], ['dbn', 'hopfield', 'autoencoder']),
+  dbn: m('family', 'probabilistic-graph', ['vision', 'tabular'], ['hybrid-belief-network', 'bipartite-energy'], ['binary-pattern'], ['reconstruction', 'latent-code'], ['hybrid-directed-undirected', 'stochastic', 'iterative-sampling'], ['逐层预训练后从顶层联合分布向下生成观测。'], ['快速向上识别是近似推断；最终DBN不是每层都保持无向的堆叠。'], ['rbm', 'vae', 'autoencoder']),
+  kan: m('family', 'small-model', ['tabular', 'scientific-computing'], ['spline-edge-functions'], ['feature-vector'], ['continuous-regression'], ['feedforward'], ['研究可学习边函数与连续函数拟合。'], ['网格和样条系数增加设计选择；表示定理不保证任意小网络高效拟合一切函数。'], ['mlp', 'rbf']),
+  lenet: m('model', 'full-model-outline', ['vision'], ['spatial-convolution', 'pooling', 'radial-basis'], ['image'], ['class-label'], ['feedforward', 'hierarchical', 'classification-head'], ['用历史LeNet-5原型学习数字图像的局部特征。'], ['原型输出为RBF距离而非softmax概率；通道连接与子采样不同于很多现代复刻。'], ['cnn', 'alexnet', 'rbf']),
+  alexnet: m('model', 'full-model-outline', ['vision'], ['spatial-convolution', 'pooling', 'dense-feedforward'], ['image'], ['class-probabilities'], ['feedforward', 'hierarchical', 'classification-head'], ['观察五个卷积层与大型全连接分类头。'], ['此页按Caffe的227输入几何；较大分类头与原设计的LRN不应被当成当今所有CNN的必要组件。'], ['lenet', 'vgg', 'inception']),
+  vgg: m('family', 'full-model-outline', ['vision'], ['spatial-convolution', 'pooling', 'dense-feedforward'], ['image'], ['class-probabilities'], ['feedforward', 'hierarchical', 'classification-head'], ['用规则3×3卷积堆叠建立图像分类基线。'], ['本页选择VGG-16配置D；大型全连接头使规则结构不等于低存储开销。'], ['alexnet', 'resnet', 'convnext']),
+  inception: m('block', 'core-block', ['vision'], ['multi-branch-convolution', 'pointwise-convolution', 'dense-concatenation'], ['image'], ['feature-representation'], ['feedforward', 'multi-scale'], ['在同一分辨率融合多尺度分支。'], ['各分支必须对齐空间尺寸；本模块不是完整GoogLeNet分类器。'], ['cnn', 'densenet', 'resnet']),
+  densenet: m('family', 'core-block', ['vision'], ['spatial-convolution', 'dense-concatenation', 'pointwise-convolution'], ['image'], ['feature-representation'], ['feedforward', 'skip-connections'], ['研究特征复用、growth rate和transition压缩。'], ['拼接保留特征也增加存储/访存；参数效率不能直接换算成实际速度。'], ['resnet', 'inception', 'convnext']),
+  'mobilenet-v2': m('family', 'core-block', ['vision'], ['depthwise-convolution', 'pointwise-convolution', 'residual-addition'], ['image'], ['feature-representation'], ['feedforward', 'local-receptive-field', 'skip-connections'], ['把空间滤波与通道混合拆分，在宽空间变换后投影回窄瓶颈。'], ['线性瓶颈后不加ReLU6；恒等捷径只适用于本页同尺寸配置。'], ['resnet', 'efficientnet', 'convnext']),
+  efficientnet: m('family', 'full-model-outline', ['vision'], ['depthwise-convolution', 'pointwise-convolution', 'channel-gating', 'compound-scaling'], ['image'], ['class-probabilities'], ['feedforward', 'hierarchical', 'classification-head'], ['以B0主干理解MBConv、SE及跨模型复合缩放。'], ['缩放是构建模型的设计规则而不是推理层；FLOPs不能保证指定硬件的实际延迟。'], ['mobilenet-v2', 'convnext', 'swin']),
+  convnext: m('family', 'core-block', ['vision'], ['depthwise-convolution', 'pointwise-convolution', 'residual-addition'], ['image'], ['feature-representation'], ['feedforward', 'local-receptive-field', 'skip-connections'], ['以大核逐通道卷积和通道MLP建立现代卷积块。'], ['本页为v1型单块；不能混入v2的GRN或把单块开销当成整网。'], ['resnet', 'mobilenet-v2', 'swin']),
+  bert: m('family', 'full-model-outline', ['language'], ['self-attention', 'dense-feedforward'], ['text'], ['token-distribution'], ['bidirectional', 'encoder-only'], ['利用左右文恢复被遮位置，获得语言表征。'], ['当前MLM路径不直接提供因果自回归生成；下游任务通常需要相应输出头。'], ['transformer', 'gpt', 't5']),
+  gpt: m('family', 'small-model', ['language'], ['causal-attention', 'dense-feedforward'], ['text'], ['token-distribution', 'generated-token'], ['causal', 'decoder-only', 'growing-memory'], ['逐位置训练下一token预测并逐步续写。'], ['此图是公开GPT式因果解码器缩略，不能代表所有后续产品的未公开细节。'], ['bert', 't5', 'rwkv', 'transformer-xl'], 'growing-memory描述未截断前缀的KV缓存增长；实际模型仍有上下文与实现限制。'),
+  t5: m('family', 'small-model', ['language'], ['self-attention', 'causal-attention', 'cross-attention'], ['text'], ['token-distribution'], ['encoder-decoder', 'bidirectional', 'causal'], ['以文本到文本形式进行条件生成与span恢复。'], ['目标端必须遵循右移/因果约定；统一接口并不意味着各任务采用同一种评分。'], ['bert', 'gpt', 'transformer'], 'bidirectional指源encoder，causal指目标decoder；不表示源文本只能从左向右读取。'),
+  swin: m('family', 'full-model-outline', ['vision'], ['window-attention', 'shifted-windows', 'relative-position'], ['image'], ['class-probabilities'], ['encoder-only', 'hierarchical', 'local-receptive-field', 'classification-head'], ['通过普通/移位窗口和patch merging学习多尺度图像表征。'], ['移位需要边界mask；单个局部窗口块不等于全局注意力。'], ['vit', 'convnext', 'inception']),
+  performer: m('family', 'core-block', ['language'], ['kernel-attention', 'random-features'], ['text'], ['feature-representation'], ['bidirectional', 'approximate-attention'], ['用FAVOR+的正随机特征替代显式两两softmax核计算。'], ['有限特征有近似误差；本页非因果全局汇总不能直接用于因果生成。'], ['transformer', 'retnet', 'log-linear-attention'], 'Performer家族也有因果前缀版本；本页traits只描述非因果attention子层。'),
+  retnet: m('family', 'core-block', ['language'], ['retention', 'temporal-decay', 'channel-gating'], ['text'], ['feature-representation'], ['causal', 'recurrent', 'fixed-size-state'], ['用同一retention的递归或并行形式聚合历史。'], ['状态固定是相对序列长度；retention不是softmax概率，也不提供无损完整历史。'], ['performer', 'rwkv', 'mamba3']),
+  rwkv: m('family', 'small-model', ['language'], ['token-shift', 'temporal-decay', 'gated-recurrence'], ['text'], ['token-logits'], ['causal', 'recurrent', 'fixed-size-state', 'decoder-only'], ['在v4型语言模型中用WKV衰减统计进行递归生成。'], ['本页v4核心统计与后续版本可能不同；还需移位输入和稳定化状态。'], ['rnn', 'gpt', 'retnet']),
+  s4: m('family', 'core-block', ['time-series', 'audio'], ['structured-state-space', 'recurrent-state'], ['numeric-sequence'], ['continuous-regression'], ['causal', 'recurrent', 'fixed-size-state'], ['将线性状态系统在递推与长卷积之间转换。'], ['固定卷积等价性需要线性时不变与初态约定；完整网络还包含非线性和通道变换。'], ['rnn', 'mamba', 'flowstate']),
+  mamba: m('family', 'core-block', ['language'], ['selective-state-space', 'causal-convolution', 'channel-gating'], ['text'], ['feature-representation'], ['causal', 'recurrent', 'fixed-size-state'], ['用输入依赖步长、写入和读出选择历史信息。'], ['选择性参数通常破坏固定卷积形式；扫描实现与固定状态都不是无损记忆保证。'], ['s4', 'mamba3', 'retnet']),
+  gcn: m('family', 'core-block', ['graph'], ['graph-message-passing'], ['graph'], ['node-probabilities'], ['permutation-equivariant', 'classification-head'], ['对给定无向图做归一化邻居聚合与节点分类。'], ['浅层只访问有限跳邻域；深层可能过度平滑，且效果受图结构和特征影响。'], ['gat', 'graphsage', 'gin']),
+  gat: m('family', 'core-block', ['graph'], ['graph-message-passing', 'neighborhood-attention'], ['graph'], ['node-probabilities'], ['permutation-equivariant', 'classification-head'], ['在图邻域内学习特征相关的聚合权重。'], ['邻接掩码仍由图提供；attention权重不是因果解释。'], ['gcn', 'graphsage', 'transformer']),
+  graphsage: m('framework', 'small-model', ['graph'], ['neighbor-sampling', 'graph-message-passing'], ['graph'], ['node-probabilities'], ['inductive-node-functions', 'classification-head'], ['共享采样与聚合函数，为未见节点构造表示。'], ['本页选择mean聚合器；采样和mean可能丢失邻居信息，归纳式不保证跨分布泛化。'], ['gcn', 'gat', 'gin'], 'GraphSAGE是多聚合器框架，本页只标注mean+concat更新的实例。'),
+  gin: m('family', 'small-model', ['graph'], ['graph-message-passing', 'sum-aggregation', 'dense-feedforward'], ['graph'], ['graph-probabilities'], ['permutation-equivariant', 'permutation-invariant-readout', 'classification-head'], ['保留邻居多重集的计数信息，再聚合为图级表示。'], ['1-WL表达力结论有条件；有限训练网络不能保证区分所有非同构图。'], ['gcn', 'graphsage', 'gat'], '节点更新重排等变，当前图级sum读出对节点重排不变。'),
+  tcn: m('family', 'core-block', ['time-series'], ['causal-convolution', 'dilated-convolution', 'residual-addition'], ['numeric-sequence'], ['continuous-regression'], ['causal', 'local-receptive-field', 'skip-connections'], ['用因果膨胀卷积并行处理逐时序列。'], ['卷积栈的感受范围有限；padding或裁剪必须保证不读取未来。'], ['rnn', 'wavenet', 'canon-layer']),
+  wavenet: m('family', 'small-model', ['audio'], ['causal-convolution', 'dilated-convolution', 'channel-gating', 'residual-addition'], ['audio'], ['generated-audio'], ['causal', 'decoder-only', 'local-receptive-field', 'skip-connections'], ['对离散波形幅值进行自回归概率建模。'], ['训练并行不等于一次生成完整波形；原始生成需要逐点采样且感受范围有限。'], ['tcn', 'gpt', 's4']),
+  nbeats: m('family', 'small-model', ['time-series'], ['dense-feedforward', 'backcast-forecast'], ['numeric-sequence'], ['point-forecast'], ['feedforward', 'skip-connections'], ['对单变量历史做backcast残差分解并累加多步预测。'], ['本页通用点预测块没有自动可解释趋势，也没有未来协变量或分位数输出。'], ['tft', 'patchtst', 'flowstate']),
+  tft: m('model', 'full-model-outline', ['time-series'], ['variable-selection', 'gated-recurrence', 'causal-attention', 'quantile-regression'], ['numeric-sequence', 'feature-vector', 'known-covariates'], ['quantile-forecast'], ['encoder-decoder', 'causal', 'known-future-covariates', 'quantile-output'], ['联合静态、历史和未来已知变量进行多时距分位数预测。'], ['未来已知变量必须在预测时真正可得；权重不证明因果，独立分位数可能交叉。'], ['lstm', 'nbeats', 'itransformer'], 'causal指注意力的时间可见性；未来只允许已知协变量，不是读取未来真实目标。'),
+  patchtst: m('family', 'small-model', ['time-series'], ['channel-independent-attention', 'self-attention'], ['numeric-sequence'], ['point-forecast'], ['encoder-only', 'non-causal-history-encoder', 'channel-independent', 'shared-channel-weights'], ['按变量独立切时间patch，用共享encoder预测未来。'], ['通道独立会限制直接跨变量交互；patch数与padding配置必须一致。'], ['itransformer', 'nbeats', 'vit']),
+  itransformer: m('family', 'small-model', ['time-series'], ['variable-attention', 'self-attention'], ['numeric-sequence'], ['point-forecast'], ['encoder-only', 'non-causal-history-encoder', 'variable-interactions'], ['把各变量的历史作为token，学习变量之间的关系。'], ['变量间注意力成本随变量数增长；固定历史嵌入不能任意更换输入长度。'], ['patchtst', 'tft', 'transformer']),
+  vqvae: m('framework', 'training-and-generation-workflow', ['vision'], ['autoencoding', 'vector-quantization'], ['image'], ['reconstruction', 'latent-code'], ['encoder-decoder', 'discrete-latent', 'latent-bottleneck', 'requires-latent-prior', 'reconstruction-only'], ['将空间编码量化为码字网格并学习重建。'], ['argmin需相应梯度近似；从零生成另需码字先验，码字也不自动等同语义标签。'], ['autoencoder', 'vae', 'latent-diffusion']),
+  ddpm: m('framework', 'training-and-generation-workflow', ['vision'], ['diffusion-denoising'], ['image', 'noise-grid'], ['noise-prediction', 'generated-image'], ['stochastic', 'iterative-sampling'], ['学习带时间条件的去噪器，再从噪声迭代生成图像。'], ['训练和采样路径不同；日程、网络与采样器共同决定结果和计算。'], ['vae', 'latent-diffusion', 'dit']),
+  'latent-diffusion': m('framework', 'training-and-generation-workflow', ['vision'], ['autoencoding', 'latent-diffusion', 'cross-attention'], ['image', 'noise-grid'], ['generated-image'], ['encoder-decoder', 'latent-bottleneck', 'iterative-sampling', 'pretrained-components'], ['在压缩潜空间中做条件去噪，最后解码图像。'], ['自编码压缩有损且采样仍需迭代；当前示意不是某个Stable Diffusion权重的实际配置。'], ['ddpm', 'dit', 'rae', 'repack-refine']),
+  dit: m('family', 'core-block', ['vision'], ['self-attention', 'conditional-normalization', 'diffusion-denoising'], ['latent-grid'], ['noise-prediction', 'variance-parameters'], ['bidirectional'], ['用时间/类别调制的Transformer作为潜空间去噪骨干。'], ['DiT骨干不包含整个采样系统；还需要采样器和潜图像解码器。'], ['vit', 'ddpm', 'repack-refine'], 'bidirectional指潜空间patch之间的空间自注意力，不是让模型访问未来去噪答案。'),
+  realnvp: m('family', 'core-block', ['density-estimation', 'tabular'], ['normalizing-flow', 'affine-coupling'], ['feature-vector', 'latent-vector'], ['latent-code', 'density'], ['dimension-preserving', 'exact-continuous-density'], ['以可逆仿射耦合把数据映射到基分布并计算连续密度。'], ['单层只变换部分坐标；离散数据的似然还需明确去量化等约定。'], ['vae', 'rbf', 'gan']),
+  memn2n: m('model', 'small-model', ['language', 'associative-memory'], ['multi-hop-attention', 'content-addressing', 'external-memory-read'], ['fact-set'], ['answer-probabilities'], ['content-addressed', 'read-only-memory', 'multi-hop'], ['围绕问题对事实槽多次寻址，输出候选答案分布。'], ['多跳查询不等同NTM式写记忆；词袋嵌入可能丢失顺序，注意力不保证逻辑推理。'], ['modern-hopfield', 'ntm', 'transformer']),
+  'transformer-xl': m('family', 'small-model', ['language'], ['causal-attention', 'segment-memory', 'relative-position'], ['text'], ['token-distribution'], ['causal', 'decoder-only', 'recurrent', 'fixed-size-state'], ['复用上一段隐藏表示，为当前段扩展上下文。'], ['每层缓存只保留规定长度；stop-gradient限制跨段梯度，不是永久可学习的外部事实库。'], ['gpt', 'ahn', 'titans']),
+};

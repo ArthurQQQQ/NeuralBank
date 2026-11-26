@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { models } from '../src/models.js';
 import { benchmarks } from '../src/benchmarks.js';
+import { createPublicCatalogAssets } from './public-catalog-assets.mjs';
+import { readPublicAuthConfig, publicAuthConfigSource } from './public-auth-config.mjs';
+import { validateModuleImports } from './validate-module-imports.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = path.join(root, 'src');
@@ -15,6 +18,7 @@ const types = {
   '.txt': 'text/plain; charset=utf-8',
 };
 const assets = {};
+const publicAuth = readPublicAuthConfig();
 async function collect(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const file = path.join(directory, entry.name);
@@ -22,7 +26,7 @@ async function collect(directory) {
     const extension = path.extname(file);
     if (!types[extension]) throw new Error(`Unsupported source asset: ${entry.name}`);
     const key = '/' + path.relative(src, file).split(path.sep).join('/');
-    const body = await readFile(file, 'utf8');
+    const body = key === '/cloud-auth-config.js' ? publicAuthConfigSource(publicAuth) : await readFile(file, 'utf8');
     assets[key] = { body, type: types[extension] };
     if (extension === '.js' || extension === '.mjs') execFileSync(process.execPath, ['--check', file], { stdio: 'pipe' });
   }
@@ -30,21 +34,14 @@ async function collect(directory) {
 execFileSync(process.execPath, [path.join(root, 'scripts/validate-catalog.mjs')], { stdio: 'inherit' });
 execFileSync(process.execPath, [path.join(root, 'scripts/validate-benchmarks.mjs')], { stdio: 'inherit' });
 await collect(src);
+for (const [name, asset] of Object.entries(createPublicCatalogAssets())) assets[`/${name}`] = asset;
 const submissionJsonSchema = await readFile(path.join(root, 'schemas/submission.schema.json'), 'utf8');
 JSON.parse(submissionJsonSchema);
 assets['/submission.schema.json'] = { body: submissionJsonSchema, type: 'application/json; charset=utf-8' };
 for (const name of ['/index.html', '/app.js', '/styles.css', '/models.js', '/diagrams.js']) {
   if (!assets[name]) throw new Error(`Required asset missing: ${name}`);
 }
-for (const [name, asset] of Object.entries(assets)) {
-  if (!name.endsWith('.js') && !name.endsWith('.mjs')) continue;
-  const imports = [...asset.body.matchAll(/(?:from\s*|import\s*)['"]([^'"]+)['"]/g)].map(match => match[1]);
-  for (const dependency of imports) {
-    if (!dependency.startsWith('.')) throw new Error(`Unexpected external import in ${name}: ${dependency}`);
-    const resolved = path.posix.resolve(path.posix.dirname(name), dependency);
-    if (!assets[resolved]) throw new Error(`Missing module ${resolved} imported by ${name}`);
-  }
-}
+validateModuleImports(assets);
 const manifest = JSON.parse(await readFile(path.join(root, '.openai/hosting.json'), 'utf8'));
 if (!manifest.project_id) throw new Error('A Site project_id is required before packaging.');
 if (manifest.static) throw new Error('Worker deployment must not declare static.directory.');
