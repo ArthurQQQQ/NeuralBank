@@ -60,6 +60,9 @@ await test('production migration and parameterized D1 queries preserve old and n
       { ...proposal, name: 'Neural Turing Machine', category: 'memory',
         summary: '控制器通过可微读写头访问外部记忆矩阵，用内容和位置寻址保存任务所需的信息。',
         source: 'https://arxiv.org/abs/1410.5401' },
+      { ...proposal, name: 'Graph Convolutional Network', category: 'graph',
+        summary: '通过含自环的归一化邻接关系聚合邻居节点表示，用图结构约束每层的信息传播。',
+        source: 'https://arxiv.org/abs/1609.02907' },
     ];
     for (const value of newFamilyProposals) {
       response = await handleContributions(request('POST', value), store);
@@ -70,8 +73,8 @@ await test('production migration and parameterized D1 queries preserve old and n
     }
     response = await handleContributions(request(), store);
     const persisted = (await response.json()).contributions;
-    assert.equal(persisted.length, 3);
-    assert.deepEqual(new Set(persisted.map(value => value.category)), new Set(['sequence', 'attention', 'memory']));
+    assert.equal(persisted.length, 4);
+    assert.deepEqual(new Set(persisted.map(value => value.category)), new Set(['sequence', 'attention', 'memory', 'graph']));
     assert.deepEqual(persisted.find(value => value.id === created.id), created);
     database.prepare("UPDATE contributions SET status = 'approved'").run();
     response = await handleContributions(request(), store);

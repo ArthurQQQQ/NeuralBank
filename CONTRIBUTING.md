@@ -68,13 +68,13 @@ JSON 是公开贡献材料，请勿放入账户 ID、浏览器学习缓存、访
 
 ### 架构与图示
 
-1. 在模型内容模块中使用唯一而稳定的 `id`。主要学习家族是 `foundations`、`vision`、`sequence`、`attention`、`generative` 或 `memory`；定义见 `src/taxonomy.js`。
+1. 在模型内容模块中使用唯一而稳定的 `id`。主要学习家族是 `foundations`、`vision`、`sequence`、`attention`、`graph`、`generative` 或 `memory`；定义见 `src/taxonomy.js`。图邻域聚合放入 `graph`，不要因为也有加权求和就归入普通 CNN。
 2. 提供名称、描述、历史年份说明、层级、学习目标、前置模型、输入输出、公式说明、关键点、易错点、测验、结构模块和来源。层级只能是「入门」「进阶」「深入」，按概念门槛划分。
 3. `prerequisites` 引用已有模型 ID，避免循环；`layers` 的 `id`、`label`、`detail`、`shape` 必须与 SVG 的 `data-layer` 索引对齐，维度前后一致。
-4. 在 `src/diagrams.js` 添加对应 ID 的紧凑图和可点击结构图，保留 `diagramIds`、语义配色、系统字体及键盘操作。循环、分支、训练目标与推理路径需要按模型机制区分。
+4. 在 `src/diagrams.js` 或 `src/expanded-diagrams.js` 添加对应 ID 的紧凑图和可点击结构图，保留 `diagramIds`、语义配色、系统字体及键盘操作。循环、分支、训练目标与推理路径需要按模型机制区分。将新 ID 加入对应家族的 `order`；学习路径必须完整且无重复。
 5. 测验提供四个选项和从零开始的正确答案索引；解释应说明原因。
 6. 近期论文还需正式的 `venue`、`problemSolved`、`methodChange`、`limitations` 和 `evidence`，并说明结果适用的模型、数据和实验范围。
-7. 运行检查与构建；界面变更要在桌面和窄屏查看图示、焦点和键盘操作。
+7. 新增模型 ID 后，用 `node scripts/check-submission.mjs --schema > schemas/submission.schema.json` 更新下载规范，确保运行时与 CI 接受同样的模型。运行检查与构建；界面变更要在桌面和窄屏查看图示、焦点和键盘操作。
 
 ### 正式 Benchmark 数据
 

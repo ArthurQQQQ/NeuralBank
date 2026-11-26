@@ -46,16 +46,21 @@ npm run check:submission -- path/to/submission.json
 
 ## 架构与学习路径
 
-| 模型家族 | 分类标识 | 基础模型 |
+图谱目前包含 **64 个架构与机制条目、7 个学习板块**。同一系列的尺寸变体不重复计数；DDPM 等训练框架会注明所用的示例网络，避免把训练目标误画成网络层。
+
+| 模型家族 | 分类标识 | 收录范围 |
 | --- | --- | --- |
-| 基础前馈 | `foundations` | Perceptron、MLP |
-| 卷积与视觉 | `vision` | CNN、ResNet、U-Net |
-| 序列建模 | `sequence` | RNN、LSTM、GRU |
-| 注意力架构 | `attention` | Transformer、ViT |
-| 表征与生成 | `generative` | Autoencoder、VAE、GAN |
-| 记忆网络 | `memory` | Hopfield、Modern Hopfield、NTM、DNC |
+| 基础与能量模型 | `foundations` | Perceptron、MLP、RBF、RBM、DBN、KAN |
+| 卷积与视觉 | `vision` | CNN、LeNet、AlexNet、VGG、Inception、ResNet、DenseNet、MobileNetV2、EfficientNet、ConvNeXt、U-Net |
+| 序列与时序 | `sequence` | RNN、LSTM、GRU、TCN、WaveNet、S4、Mamba、RWKV、N-BEATS、TFT、PatchTST、iTransformer，以及近期论文选读 |
+| 注意力与保留机制 | `attention` | Transformer、BERT、GPT、T5、ViT、Swin、Performer、RetNet，以及近期论文选读 |
+| 图神经网络 | `graph` | GCN、GraphSAGE、GAT、GIN |
+| 表征与生成 | `generative` | Autoencoder、GAN、VAE、VQ-VAE、RealNVP、DDPM、Latent Diffusion、DiT，以及近期论文选读 |
+| 记忆网络 | `memory` | Hopfield、Modern Hopfield、MemN2N、NTM、DNC、Transformer-XL、Titans、AHN |
 
 每个架构使用一个代表性教学配置；图示节点可能缩略，实际维度见模块说明。图谱覆盖三个学习层级「入门／进阶／深入」，按概念门槛划分，不表示性能或论文质量排名。推荐下一关时优先选择前置条件已满足的待学习项，也可自由浏览。
+
+新增条目均保留原始论文或作者资料链接，说明单个核心模块与完整模型的区别。架构库是人工整理的学习选集，并非全部神经网络的穷举；新增架构也不会自动产生 Benchmark 成绩，未收录的成绩仍明确显示为空缺。
 
 近期论文选读包含 ICLR 2026 的 Log-Linear Attention、Mamba-3、RAE + DiT，ICML 2026 的 AHN、FlowState、RePack then Refine，以及 NeurIPS 2025 的 Titans、Gated Attention、Canon Layer。条目分别说明问题、方法改动、论文报告的证据和具体局限。这是人工选读，不是会议完整索引，也不承诺自动追踪最新录用论文。
 
@@ -90,8 +95,8 @@ Benchmark 成绩绑定具体模型变体、指标和评估协议，保留配置�
 
 | 位置 | 内容 |
 | --- | --- |
-| `src/models.js`、`src/additional-models.js`、`src/venue-models.js` | 架构内容、教学配置、前置模型与原始来源 |
-| `src/diagrams.js`、`src/taxonomy.js` | 原创 SVG 图与家族、层级定义 |
+| `src/models.js`、`src/additional-models.js`、`src/venue-models.js`、`src/expanded-*-models.js` | 架构内容、教学配置、前置模型与原始来源 |
+| `src/diagrams.js`、`src/expanded-diagrams.js`、`src/taxonomy.js` | 原创 SVG 图与家族、层级定义 |
 | `src/benchmarks.js` | 正式收录的任务、指标与成绩 |
 | `src/learning-progress.js`、`src/learning-sync.js` | 访客记录、账户缓存与同步 |
 | `schemas/submission.schema.json`、`scripts/check-submission.mjs` | 贡献格式与本地检查器 |

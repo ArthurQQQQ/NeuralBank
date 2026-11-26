@@ -1,5 +1,6 @@
 // Hand-drawn, dependency-free architecture diagrams. Each interactive layer
 // corresponds, in order, to the layer explanation in models.js.
+import { expandedDiagram, expandedDiagramIds } from './expanded-diagrams.js';
 let serial = 0;
 
 const C = {
@@ -46,7 +47,7 @@ const names = {
   flowstate: ['FlowState', ['因果归一化', '线性嵌入', 'S5 与 MLP 编码', '末态基系数', '连续函数解码', '采样与逆归一化']],
   'repack-refine': ['RePack then Refine', ['冻结表征编码器', 'RePack 投影', 'DiT 速度场采样', 'RePack 解码器', 'Latent 引导 Refiner', '最终图像']],
 };
-export const diagramIds = Object.freeze(Object.keys(names));
+export const diagramIds = Object.freeze([...Object.keys(names), ...expandedDiagramIds]);
 
 const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 // An explicit attribute replaces its default rather than producing duplicate
@@ -59,6 +60,7 @@ const r = (x, y, w, h, options = '') => `<rect x="${x}" y="${y}" width="${w}" he
 const circ = (x, y, radius, options = '') => `<circle cx="${x}" cy="${y}" r="${radius}" ${options}/>`;
 
 export function diagram(modelId, { compact = false, activeLayer = -1, signalStep = -1 } = {}) {
+  if (expandedDiagramIds.includes(modelId)) return expandedDiagram(modelId, { compact, activeLayer, signalStep });
   const id = Object.hasOwn(names, modelId) ? modelId : 'mlp';
   const uid = `nb-net-${++serial}`;
   const [name, labels] = names[id];

@@ -1,4 +1,4 @@
-export const CATEGORIES = ['foundations', 'vision', 'sequence', 'attention', 'generative', 'memory'];
+export const CATEGORIES = ['foundations', 'vision', 'sequence', 'attention', 'graph', 'generative', 'memory'];
 export const MAX_BODY_BYTES = 8192;
 
 export function jsonResponse(value, status = 200) {

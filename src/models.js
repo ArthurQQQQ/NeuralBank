@@ -1,5 +1,7 @@
 import { additionalModels } from './additional-models.js';
 import { venueModels } from './venue-models.js';
+import { expandedCoreModels } from './expanded-core-models.js';
+import { expandedSpecialistModels } from './expanded-specialist-models.js';
 
 // Educational examples. B = batch size, T = sequence length.
 // `year` marks a cited historical milestone, not necessarily the architecture's first invention.
@@ -190,5 +192,7 @@ export const models = [
     ]
   },
   ...additionalModels,
-  ...venueModels
+  ...venueModels,
+  ...expandedCoreModels,
+  ...expandedSpecialistModels
 ];

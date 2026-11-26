@@ -95,7 +95,7 @@ function matchesFilters(model,ignore = '') {
     && (ignore === 'mastery' || matchesLearningStatus(model.id,state.learned,state.mastery))
     && matchesSearch(model);
 }
-function publicationLabel(model) { return model.venue ? `${model.venue.name} ${model.venue.year}` : `${model.year} · 经典里程碑`; }
+function publicationLabel(model) { return model.venue ? `${model.venue.name} ${model.venue.year}` : `${model.year} · 文献节点`; }
 function masteryControl(model,context = 'card') {
   const learned = state.learned.has(model.id);
   return `<button class="mastery-toggle ${learned ? 'is-mastered' : ''} ${context === 'level' ? 'level-mastery-toggle' : ''}" data-toggle-learned="${model.id}" aria-pressed="${learned}" aria-label="${escape(model.name)}：${learned ? '标记为未掌握' : '标记为已掌握'}" title="${learned ? '标记为未掌握' : '标记为已掌握'}"><span aria-hidden="true">${learned ? '✓' : '○'}</span>${learned ? '已掌握' : '未掌握'}</button>`;

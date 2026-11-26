@@ -8,6 +8,16 @@ const familyIds = new Set(categories.map(category => category.id));
 const levels = new Set(difficulties.map(level => level.id));
 assert.equal(ids.size, models.length, 'Model ids must be unique.');
 assert.equal(familyIds.size, categories.length, 'Family ids must be unique.');
+const orderedIds = categories.flatMap(category => category.order);
+assert.equal(new Set(orderedIds).size, orderedIds.length, 'Family ordering must not repeat models.');
+assert.deepEqual(new Set(orderedIds), ids, 'Family ordering must cover every model exactly once.');
+for (const category of categories) {
+  assert(category.order.length, `${category.id}: a family must contain models`);
+  for (const id of category.order) {
+    assert.equal(models.find(model => model.id === id)?.category, category.id, `${id}: family ordering must match its category`);
+  }
+}
+assert.deepEqual(new Set(diagramIds), ids, 'Every model needs one registered diagram, with no orphan diagrams.');
 
 for (const model of models) {
   const prefix = `${model.id}: `;
@@ -33,6 +43,7 @@ for (const model of models) {
   assert.equal(new Set(model.layers.map(layer => layer.id)).size, model.layers.length, prefix + 'duplicate module id');
   for (const layer of model.layers) for (const field of ['id','label','detail','shape']) assert(typeof layer[field] === 'string' && layer[field].trim(), prefix + `module needs ${field}`);
   assert(Array.isArray(model.prerequisites), prefix + 'prerequisites must be an array');
+  assert.equal(new Set(model.prerequisites).size, model.prerequisites.length, prefix + 'prerequisites must not repeat');
   for (const prerequisite of model.prerequisites) assert(ids.has(prerequisite) && prerequisite !== model.id, prefix + 'invalid prerequisite');
   if (model.venue) {
     const venueHosts = {ICLR:['proceedings.iclr.cc'],ICML:['proceedings.mlr.press'],NeurIPS:['papers.nips.cc','papers.neurips.cc','proceedings.neurips.cc']};
