@@ -9,12 +9,44 @@ import { architectureMetadata, architectureAxes } from './architecture-metadata.
 import { createCloudAuth } from './cloud-auth.js';
 import { cloudAuthConfig } from './cloud-auth-config.js';
 import { createAccountLogin } from './account-login.js';
+import { bibliography, getBibliography, venueLabel } from './bibliography.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const escape = (value) => String(value ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 const categoryNames = Object.fromEntries(categories.map(category => [category.id, category.name]));
 const axisLabel = (axis, id) => architectureAxes[axis].find(item => item.id === id)?.label || id;
+const bibliographyCache = new Map();
+const research = id => { if (!bibliographyCache.has(id)) bibliographyCache.set(id, getBibliography(id)); return bibliographyCache.get(id); };
+const publicationVenues = [...new Set(models.map(model => bibliography[model.id].primaryPaper.venue.name))].sort();
+const publicationYears = [...new Set(models.map(model => bibliography[model.id].primaryPaper.venue.year))].sort((a,b) => b-a);
+const publicationTypeLabels = { conference:'会议论文', journal:'期刊论文', preprint:'预印本', 'technical-report':'技术报告', book:'书籍／章节' };
+const repositoryLabels = { 'author-official':'原作者仓库', 'reference-implementation':'参考实现', 'third-party':'社区实现' };
+const countLabel = citation => citation.count === null ? '被引次数待收录' : `${new Intl.NumberFormat('zh-CN').format(citation.count)} 次被引 · ${citation.source}`;
+const citationDate = citation => citation.retrievedAt ? new Date(citation.retrievedAt).toLocaleDateString('zh-CN') : '';
+function shortVenue(name) {
+  for (const [expression, label] of [[/ICLR|International Conference on Learning Representations/i,'ICLR'],[/ICML|International Conference on Machine Learning/i,'ICML'],[/NeurIPS/,'NeurIPS'],[/NIPS/,'NIPS'],[/CVPR|Computer Vision and Pattern Recognition/i,'CVPR'],[/ICCV|International Conference on Computer Vision/i,'ICCV'],[/NAACL|North American Chapter/i,'NAACL'],[/Findings.*EMNLP|EMNLP.*Findings/i,'EMNLP Findings'],[/MICCAI|Medical Image Computing/i,'MICCAI'],[/JMLR|Journal of Machine Learning Research/i,'JMLR']]) if (expression.test(name)) return label;
+  return name;
+}
+function paperHeader(model) {
+  const info = research(model.id), repo = info.repositories.find(item => item.relationship === 'author-official') || info.repositories[0];
+  const paper = info.primaryPaper;
+  return `<div class="detail-research-links"><a href="${escape(paper.url)}" target="_blank" rel="noopener noreferrer">论文 · ${escape(shortVenue(paper.venue.name))} ${paper.venue.year}</a>${repo ? `<a href="${escape(repo.url)}" title="${escape(repo.scope)}" target="_blank" rel="noopener noreferrer">${escape(repositoryLabels[repo.relationship])}</a>` : ''}${info.citation.count === null ? '<span>被引次数待收录</span>' : `<a href="${escape(info.citation.url)}" title="${escape(citationDate(info.citation))} · ${escape(info.citation.note)}" target="_blank" rel="noopener noreferrer">${escape(countLabel(info.citation))}</a>`}</div>`;
+}
+function publicationSummary(model, extraClass = '') {
+  const info = research(model.id);
+  return `<div class="publication-summary ${extraClass}"><a class="publication-label ${model.venue ? 'recent-publication' : ''}" href="${escape(info.primaryPaper.url)}" title="${escape(venueLabel(info.primaryPaper))} · ${escape(model.yearNote)}" target="_blank" rel="noopener noreferrer">${escape(publicationLabel(model))}</a><span class="citation-mini" title="${escape(info.citation.note)}">${escape(countLabel(info.citation))}${info.citation.count === null ? '' : ` · ${escape(citationDate(info.citation))}`}</span></div>`;
+}
+function renderPaperInfo(model) {
+  const info = research(model.id), paper = info.primaryPaper, citation = info.citation;
+  const repositoryCards = info.repositories.map(repo => `<article class="paper-repository"><span class="paper-relationship">${escape(repositoryLabels[repo.relationship])}</span><h4><a href="${escape(repo.url)}" target="_blank" rel="noopener noreferrer">${escape(repo.label)}</a></h4><p>${escape(repo.scope)}</p>${repo.note ? `<p class="paper-version-note">${escape(repo.note)}</p>` : ''}</article>`).join('');
+  return `<article class="paper-record"><div class="paper-publication"><a href="${escape(paper.venue.url)}" target="_blank" rel="noopener noreferrer">${escape(venueLabel(paper))}</a><span>${escape(publicationTypeLabels[paper.venue.type])}</span>${paper.preprintYear && paper.preprintYear !== paper.year ? `<span>arXiv 首版 ${paper.preprintYear}</span>` : ''}</div><h3 class="paper-title"><a href="${escape(paper.url)}" target="_blank" rel="noopener noreferrer">${escape(paper.title)}</a></h3><p class="paper-authors">${paper.authors.map(escape).join(', ')}</p><div class="paper-identifiers">${paper.doi ? `<a href="https://doi.org/${escape(paper.doi)}" target="_blank" rel="noopener noreferrer">DOI: ${escape(paper.doi)}</a>` : ''}${paper.arxivId ? `<a href="https://arxiv.org/abs/${escape(paper.arxivId)}" target="_blank" rel="noopener noreferrer">arXiv: ${escape(paper.arxivId)}</a>` : ''}</div><div class="paper-citation-stat"><span>代表论文被引快照</span><strong>${citation.count === null ? '尚未收录可核对的次数' : new Intl.NumberFormat('zh-CN').format(citation.count)}</strong>${citation.count !== null ? `<a href="${escape(citation.url)}" target="_blank" rel="noopener noreferrer">${escape(citation.source)} · 查询于 ${escape(citationDate(citation))}</a>` : ''}</div><details class="citation-provenance"><summary>统计来源与版本说明</summary><p>${escape(citation.note)}</p>${citation.matchedTitle ? `<p>匹配记录：${escape(citation.matchedTitle)}</p>` : ''}<p>历史教学节点：${escape(model.yearNote)}</p></details><section class="paper-citation"><h3>引用这篇论文</h3><p>${escape(info.citationText)}</p><div class="paper-actions"><button class="button secondary" data-copy-citation="${model.id}">复制引用</button><button class="button secondary" data-download-bibtex="${model.id}">下载 BibTeX</button></div><details><summary>BibTeX</summary><pre>${escape(info.bibtex)}</pre></details></section><section class="paper-code"><h3>代码仓库</h3>${repositoryCards || '<p class="paper-version-note">尚未收录可核实的代码仓库；这不表示该模型从未有过实现。</p>'}</section><p class="paper-version-note">这里选取一篇明确的代表论文。各条 Benchmark 的训练配置、协议与独立出处见 Benchmarks。</p></article>`;
+}
+function downloadPaperCitation(id) {
+  const url = URL.createObjectURL(new Blob([research(id).bibtex + '\n'], { type:'application/x-bibtex;charset=utf-8' }));
+  const link = document.createElement('a'); link.href = url; link.download = `${id}.bib`; document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 const rank = id => difficulties.findIndex(level => level.id === id);
 const orderedModels = categories.flatMap(category => models.filter(model => model.category === category.id).sort((a,b) => rank(a.level) - rank(b.level) || category.order.indexOf(a.id) - category.order.indexOf(b.id)));
 const modelIds = new Set(models.map(model => model.id));
@@ -25,7 +57,7 @@ const accountLogin = createAccountLogin({ root: $('#account-content'), auth: clo
 const statuses = [{id:'all',name:'全部'},{id:'mastered',name:'已掌握'},{id:'unmastered',name:'未掌握'}];
 const venueKey = model => model.venue ? `${model.venue.name}:${model.venue.year}` : 'classic';
 const sourceOptions = [{id:'all',name:'全部来源'},{id:'classic',name:'基础图谱'},{id:'recent',name:'三会新架构'},...['ICLR','ICML','NeurIPS'].flatMap(name => [...new Set(models.filter(model => model.venue?.name === name).map(model => model.venue.year))].sort((a,b) => b-a).map(year => ({id:`${name}:${year}`,name:`${name} ${year}`})))];
-const state = { view:'learning',track:'foundations',task:'all',benchmarkQuery:'',category:'all',level:'all',architectureTask:'all',entityType:'all',venue:'all',mastery:'all',query:'',learned:loadLearned(learningStorage,modelIds),progressSaved:Boolean(learningStorage),model:null,tab:'structure',layer:0,quizAnswer:null };
+const state = { view:'learning',track:'foundations',task:'all',benchmarkQuery:'',category:'all',level:'all',architectureTask:'all',entityType:'all',publicationVenue:'all',publicationYear:'all',venue:'all',mastery:'all',query:'',learned:loadLearned(learningStorage,modelIds),progressSaved:Boolean(learningStorage),model:null,tab:'structure',layer:0,quizAnswer:null };
 let diagramTimer = null;
 let toastTimer = null;
 let modelOpener = null;
@@ -84,7 +116,7 @@ function renderLevels() {
     const done = state.learned.has(model.id);
     const prerequisites = model.prerequisites.filter(id => !state.learned.has(id));
     const label = done ? '已掌握' : prerequisites.length ? '建议先学' : '可以开始';
-    return `<article class="level-card ${done ? 'completed' : prerequisites.length ? 'upcoming' : 'ready'}"><button class="level-main" data-open="${model.id}" aria-label="第 ${index+1} 关 ${escape(model.name)}，${label}"><span class="level-card-heading"><span class="lesson-number">${done ? '✓' : String(index+1).padStart(2,'0')}</span><span class="lesson-state">${done ? '已掌握' : model.level}</span></span><span class="level-visual" aria-hidden="true">${diagram(model.id,{compact:true})}</span><strong>${escape(model.name)}</strong><span class="level-description">${escape(model.tagline)}</span></button><div class="level-card-footer"><span>${prerequisites.length && !done ? `先学 ${prerequisites.map(id => models.find(item => item.id === id)?.name).join('、')}` : done ? '随时回顾' : '结构 · 原理 · 自测'}</span>${masteryControl(model,'level')}</div></article>`;
+    return `<article class="level-card ${done ? 'completed' : prerequisites.length ? 'upcoming' : 'ready'}"><button class="level-main" data-open="${model.id}" aria-label="第 ${index+1} 关 ${escape(model.name)}，${label}"><span class="level-card-heading"><span class="lesson-number">${done ? '✓' : String(index+1).padStart(2,'0')}</span><span class="lesson-state">${done ? '已掌握' : model.level}</span></span><span class="level-visual" aria-hidden="true">${diagram(model.id,{compact:true})}</span><strong>${escape(model.name)}</strong><span class="level-description">${escape(model.tagline)}</span></button>${publicationSummary(model,'level-publication')}<div class="level-card-footer"><span>${prerequisites.length && !done ? `先学 ${prerequisites.map(id => models.find(item => item.id === id)?.name).join('、')}` : done ? '随时回顾' : '结构 · 原理 · 自测'}</span>${masteryControl(model,'level')}</div></article>`;
   }).join('');
 }
 
@@ -92,7 +124,8 @@ function matchesSearch(model) {
   const query = state.query.toLocaleLowerCase().trim();
   const metadata = architectureMetadata[model.id];
   const selectionTerms = [...metadata.supportedTasks.map(id => axisLabel('tasks',id)), ...metadata.mechanisms.map(id => axisLabel('mechanisms',id)), ...metadata.representativeUseCases, ...metadata.traits.map(id => axisLabel('traits',id))].join(' ');
-  return `${model.name} ${model.fullName} ${model.tagline} ${model.description} ${model.problemSolved || ''} ${model.methodChange || ''} ${(model.limitations || []).join(' ')} ${model.venue?.name || ''} ${model.venue?.year || ''} ${categoryNames[model.category]} ${model.keyPoints.join(' ')} ${model.layers.map(layer => layer.label).join(' ')} ${selectionTerms}`.toLocaleLowerCase().includes(query);
+  const paper = research(model.id).primaryPaper;
+  return `${model.name} ${model.fullName} ${model.tagline} ${model.description} ${model.problemSolved || ''} ${model.methodChange || ''} ${(model.limitations || []).join(' ')} ${model.venue?.name || ''} ${model.venue?.year || ''} ${categoryNames[model.category]} ${model.keyPoints.join(' ')} ${model.layers.map(layer => layer.label).join(' ')} ${selectionTerms} ${paper.title} ${paper.authors.join(' ')} ${paper.venue.name}`.toLocaleLowerCase().includes(query);
 }
 function matchesSource(model,source) {
   return source === 'all' || (source === 'recent' ? Boolean(model.venue) : venueKey(model) === source);
@@ -104,9 +137,11 @@ function matchesFilters(model,ignore = '') {
     && (ignore === 'mastery' || matchesLearningStatus(model.id,state.learned,state.mastery))
     && (state.architectureTask === 'all' || architectureMetadata[model.id].supportedTasks.includes(state.architectureTask))
     && (state.entityType === 'all' || architectureMetadata[model.id].entityType === state.entityType)
+    && (state.publicationVenue === 'all' || bibliography[model.id].primaryPaper.venue.name === state.publicationVenue)
+    && (state.publicationYear === 'all' || String(bibliography[model.id].primaryPaper.venue.year) === state.publicationYear)
     && matchesSearch(model);
 }
-function publicationLabel(model) { return model.venue ? `${model.venue.name} ${model.venue.year}` : `${model.year} · 文献节点`; }
+function publicationLabel(model) { const venue = bibliography[model.id].primaryPaper.venue; return `${shortVenue(venue.name)} ${venue.year}`; }
 function masteryControl(model,context = 'card') {
   const learned = state.learned.has(model.id);
   return `<button class="mastery-toggle ${learned ? 'is-mastered' : ''} ${context === 'level' ? 'level-mastery-toggle' : ''}" data-toggle-learned="${model.id}" aria-pressed="${learned}" aria-label="${escape(model.name)}：${learned ? '标记为未掌握' : '标记为已掌握'}" title="${learned ? '标记为未掌握' : '标记为已掌握'}"><span aria-hidden="true">${learned ? '✓' : '○'}</span>${learned ? '已掌握' : '未掌握'}</button>`;
@@ -114,7 +149,7 @@ function masteryControl(model,context = 'card') {
 function modelCard(model) {
   const levelIndex = rank(model.level);
   const scoreCount = new Set(benchmarkResults.filter(result => result.modelId === model.id).map(result => result.benchmarkId)).size;
-  return `<article class="model-card" data-model-id="${model.id}"><button class="card-main" data-open="${model.id}" aria-label="探索 ${escape(model.name)} ${escape(model.fullName)}"><div class="card-top"><span class="category-tag cat-${model.category}"><span class="category-mark"></span>${categoryNames[model.category]}</span><span class="level-tag level-${levelIndex}"><span class="difficulty-bars" aria-hidden="true">${[0,1,2].map(index => `<i class="${index <= levelIndex ? 'filled' : ''}"></i>`).join('')}</span>${model.level}</span></div><div class="model-visual" aria-hidden="true">${diagram(model.id,{compact:true})}</div><div class="card-content"><h3 class="card-title">${escape(model.name)}</h3><div class="card-full-name">${escape(model.fullName)}</div><p class="card-tagline">${escape(model.tagline)}</p></div></button><div class="card-bottom"><span class="publication-label ${model.venue ? 'recent-publication' : ''}" title="${escape(model.yearNote)}">${escape(publicationLabel(model))}</span><div class="card-actions"><button class="card-scores" data-score-model="${model.id}" aria-label="查看 ${escape(model.name)} 的 Benchmark 成绩">${scoreCount ? `${scoreCount} 项 Benchmark` : '暂无成绩'}</button>${masteryControl(model)}</div></div></article>`;
+  return `<article class="model-card" data-model-id="${model.id}"><button class="card-main" data-open="${model.id}" aria-label="探索 ${escape(model.name)} ${escape(model.fullName)}"><div class="card-top"><span class="category-tag cat-${model.category}"><span class="category-mark"></span>${categoryNames[model.category]}</span><span class="level-tag level-${levelIndex}"><span class="difficulty-bars" aria-hidden="true">${[0,1,2].map(index => `<i class="${index <= levelIndex ? 'filled' : ''}"></i>`).join('')}</span>${model.level}</span></div><div class="model-visual" aria-hidden="true">${diagram(model.id,{compact:true})}</div><div class="card-content"><h3 class="card-title">${escape(model.name)}</h3><div class="card-full-name">${escape(model.fullName)}</div><p class="card-tagline">${escape(model.tagline)}</p></div></button><div class="card-bottom">${publicationSummary(model)}<div class="card-actions"><button class="card-scores" data-score-model="${model.id}" aria-label="查看 ${escape(model.name)} 的 Benchmark 成绩">${scoreCount ? `${scoreCount} 项 Benchmark` : '暂无成绩'}</button>${masteryControl(model)}</div></div></article>`;
 }
 function renderCatalog() {
   const filtered = orderedModels.filter(model => matchesFilters(model));
@@ -129,11 +164,15 @@ function renderCatalog() {
   if (state.mastery !== 'all') labels.push(statuses.find(status => status.id === state.mastery).name);
   if (state.architectureTask !== 'all') labels.push(axisLabel('tasks',state.architectureTask));
   if (state.entityType !== 'all') labels.push(axisLabel('entityTypes',state.entityType));
+  if (state.publicationVenue !== 'all') labels.push(shortVenue(state.publicationVenue));
+  if (state.publicationYear !== 'all') labels.push(state.publicationYear);
   $('#visible-models').textContent = `${labels.join(' · ')} · ${filtered.length} 个模型`;
   $('#empty-state').hidden = filtered.length !== 0;
-  $('#reset-filters').hidden = state.category === 'all' && state.level === 'all' && state.venue === 'all' && state.mastery === 'all' && state.architectureTask === 'all' && state.entityType === 'all' && !state.query;
+  $('#reset-filters').hidden = state.category === 'all' && state.level === 'all' && state.venue === 'all' && state.mastery === 'all' && state.architectureTask === 'all' && state.entityType === 'all' && state.publicationVenue === 'all' && state.publicationYear === 'all' && !state.query;
   $('#architecture-task').value = state.architectureTask;
   $('#architecture-type').value = state.entityType;
+  $('#publication-venue').value = state.publicationVenue;
+  $('#publication-year').value = state.publicationYear;
   const facetGroups = [
     {selector:'.filter',field:'category',data:'category',predicate:(model,value) => value === 'all' || model.category === value},
     {selector:'.difficulty-filter',field:'level',data:'difficulty',predicate:(model,value) => value === 'all' || model.level === value},
@@ -181,6 +220,8 @@ function renderCategoryContext() {
 }
 
 function initializeCatalog() {
+  $('#publication-venue').innerHTML = '<option value="all">全部 venue</option>' + publicationVenues.map(name => `<option value="${escape(name)}">${escape(name)}</option>`).join('');
+  $('#publication-year').innerHTML = '<option value="all">全部年份</option>' + publicationYears.map(year => `<option value="${year}">${year}</option>`).join('');
   $('#architecture-task').innerHTML = '<option value="all">全部任务</option>' + architectureAxes.tasks.map(item => `<option value="${escape(item.id)}">${escape(item.label)}</option>`).join('');
   $('#architecture-type').innerHTML = '<option value="all">全部条目</option>' + architectureAxes.entityTypes.map(item => `<option value="${escape(item.id)}">${escape(item.label)}</option>`).join('');
   $('#category-filters').innerHTML = [{id:'all',name:'全部架构'},...categories].map(category => `<button data-category="${category.id}" class="filter" aria-pressed="false">${category.name}<span data-count></span></button>`).join('');
@@ -191,7 +232,7 @@ function initializeCatalog() {
 }
 
 function resetFilters() {
-  state.category = 'all'; state.level = 'all'; state.venue = 'all'; state.mastery = 'all'; state.architectureTask = 'all'; state.entityType = 'all'; state.query = ''; $('#model-search').value = ''; renderCatalog();
+  state.category = 'all'; state.level = 'all'; state.venue = 'all'; state.mastery = 'all'; state.architectureTask = 'all'; state.entityType = 'all'; state.publicationVenue = 'all'; state.publicationYear = 'all'; state.query = ''; $('#model-search').value = ''; renderCatalog();
 }
 function setFilter(category) { state.category = category; renderCatalog(); }
 $('.category-filters').addEventListener('click', event => { const button = event.target.closest('[data-category]'); if (button) setFilter(button.dataset.category); });
@@ -200,6 +241,8 @@ $('#model-grid').addEventListener('click', event => { const button = event.targe
 $('#explore-memory').addEventListener('click', () => { resetFilters(); setFilter('memory'); });
 $('#architecture-task').addEventListener('change', event => { state.architectureTask = event.target.value; renderCatalog(); });
 $('#architecture-type').addEventListener('change', event => { state.entityType = event.target.value; renderCatalog(); });
+$('#publication-venue').addEventListener('change', event => { state.publicationVenue = event.target.value; renderCatalog(); });
+$('#publication-year').addEventListener('change', event => { state.publicationYear = event.target.value; renderCatalog(); });
 $('#explore-recent').addEventListener('click',() => { resetFilters(); state.venue = 'recent'; renderCatalog(); });
 $('#venue-filters').addEventListener('click',event => { const button = event.target.closest('[data-venue]'); if (button) { state.venue = button.dataset.venue; renderCatalog(); } });
 $('#mastery-filters').addEventListener('click',event => { const button = event.target.closest('[data-mastery]'); if (button) { state.mastery = button.dataset.mastery; renderCatalog(); } });
@@ -268,7 +311,7 @@ function openModel(id,initialTab) {
 function renderDetail() {
   const model = state.model;
   const mastered = state.learned.has(model.id);
-  $('#model-detail').innerHTML = `<div class="detail-header"><div><div class="detail-eyebrow"><span>${categoryNames[model.category]}</span><span>${model.level}</span></div><h2 id="model-title">${escape(model.name)}</h2><p class="detail-subtitle">${escape(model.fullName)} · ${escape(publicationLabel(model))}</p>${model.venue ? `<a class="detail-paper-link" href="${escape(model.venue.url)}" target="_blank" rel="noopener noreferrer">${escape(model.venue.name)} ${model.venue.year} · 正式论文</a>` : ''}</div><div class="detail-header-actions"><button class="text-button" data-edit-model="${model.id}">建议编辑</button><button class="icon-button" data-close="model-dialog" aria-label="关闭模型详情">×</button></div></div><div class="model-learning-context"><p>${escape(model.learningGoal || model.tagline)}</p><div class="prerequisite-links"><span>建议先学</span>${(model.prerequisites || []).length ? model.prerequisites.map(id => { const prerequisite = models.find(item => item.id === id); return prerequisite ? `<button data-open="${id}">${escape(prerequisite.name)}</button>` : ''; }).join('') : '<span class="no-prerequisite">可作为学习起点</span>'}</div></div><div class="detail-tabs" role="tablist" aria-label="模型学习内容">${[...(model.venue ? [['problem','问题与局限']] : []),['structure','结构拆解'],['principles','核心原理'],['selection','选型参考'],['quiz','考点自测'],['scores','Benchmarks']].map(([id,label]) => `<button role="tab" id="tab-${id}" data-tab="${id}" aria-selected="${state.tab === id}" aria-controls="detail-tabpanel" tabindex="${state.tab === id ? '0' : '-1'}">${label}</button>`).join('')}</div><div class="detail-body" id="detail-tabpanel" role="tabpanel" aria-labelledby="tab-${state.tab}"></div><div class="detail-footer"><p class="detail-storage-label">${escape(storageLabel())}</p><button class="button ${mastered ? 'mastered-button' : 'secondary'}" id="toggle-mastered" aria-pressed="${mastered}">${mastered ? '✓ 已掌握 · 标记为未掌握' : '标记为已掌握'}</button></div>`;
+  $('#model-detail').innerHTML = `<div class="detail-header"><div><div class="detail-eyebrow"><span>${categoryNames[model.category]}</span><span>${model.level}</span></div><h2 id="model-title">${escape(model.name)}</h2><p class="detail-subtitle">${escape(model.fullName)} · ${escape(publicationLabel(model))}</p>${paperHeader(model)}</div><div class="detail-header-actions"><button class="text-button" data-edit-model="${model.id}">建议编辑</button><button class="icon-button" data-close="model-dialog" aria-label="关闭模型详情">×</button></div></div><div class="model-learning-context"><p>${escape(model.learningGoal || model.tagline)}</p><div class="prerequisite-links"><span>建议先学</span>${(model.prerequisites || []).length ? model.prerequisites.map(id => { const prerequisite = models.find(item => item.id === id); return prerequisite ? `<button data-open="${id}">${escape(prerequisite.name)}</button>` : ''; }).join('') : '<span class="no-prerequisite">可作为学习起点</span>'}</div></div><div class="detail-tabs" role="tablist" aria-label="模型学习内容">${[...(model.venue ? [['problem','问题与局限']] : []),['structure','结构拆解'],['principles','核心原理'],['papers','论文与代码'],['selection','选型参考'],['quiz','考点自测'],['scores','Benchmarks']].map(([id,label]) => `<button role="tab" id="tab-${id}" data-tab="${id}" aria-selected="${state.tab === id}" aria-controls="detail-tabpanel" tabindex="${state.tab === id ? '0' : '-1'}">${label}</button>`).join('')}</div><div class="detail-body" id="detail-tabpanel" role="tabpanel" aria-labelledby="tab-${state.tab}"></div><div class="detail-footer"><p class="detail-storage-label">${escape(storageLabel())}</p><button class="button ${mastered ? 'mastered-button' : 'secondary'}" id="toggle-mastered" aria-pressed="${mastered}">${mastered ? '✓ 已掌握 · 标记为未掌握' : '标记为已掌握'}</button></div>`;
   renderDetailBody();
 }
 
@@ -283,6 +326,8 @@ function renderDetailBody() {
     renderInspector();
   } else if (state.tab === 'principles') {
     body.innerHTML = `<p class="detail-intro">${escape(model.description)}</p><div class="principle-grid"><div><h3>三个核心要点</h3><ul>${model.keyPoints.map(point => `<li>${escape(point)}</li>`).join('')}</ul></div><aside class="pitfall"><h3>容易踩的坑</h3><p>${escape(model.pitfall)}</p></aside></div><div class="formula-box"><h3>核心公式</h3><p class="formula">${escape(model.formula)}</p><p class="formula-explanation">${escape(model.formulaExplanation)}</p></div><div class="references"><h3>回到原始资料</h3>${model.references.map(reference => `<a href="${escape(reference.url)}" target="_blank" rel="noopener noreferrer">${escape(reference.label)}</a>`).join('')}</div>`;
+  } else if (state.tab === 'papers') {
+    body.innerHTML = renderPaperInfo(model);
   } else if (state.tab === 'selection') {
     const metadata = architectureMetadata[model.id];
     body.innerHTML = `<p class="detail-intro">${escape(metadata.scopeNote)}</p><div class="selection-tags"><span>${escape(axisLabel('entityTypes',metadata.entityType))}</span>${metadata.supportedTasks.map(id => `<span>${escape(axisLabel('tasks',id))}</span>`).join('')}${metadata.traits.map(id => `<span>${escape(axisLabel('traits',id))}</span>`).join('')}</div><div class="principle-grid"><div><h3>可以从这些用途切入</h3><ul>${metadata.representativeUseCases.map(value => `<li>${escape(value)}</li>`).join('')}</ul></div><aside class="pitfall"><h3>选择时的取舍</h3><ul>${metadata.tradeoffs.map(value => `<li>${escape(value)}</li>`).join('')}</ul></aside></div><div class="selection-mechanisms"><h3>核心机制</h3><p>${metadata.mechanisms.map(id => escape(axisLabel('mechanisms',id))).join(' · ')}</p><p>${escape(metadata.teachingScope)}</p></div><div class="prerequisite-links selection-related"><span>对照阅读</span>${metadata.relatedModelIds.map(id => `<button data-open="${id}">${escape(models.find(item => item.id === id).name)}</button>`).join('')}</div><p class="selection-note">适用任务是选型线索，具体效果需要结合数据、训练配置与相同协议下的成绩判断。</p>`;
@@ -327,6 +372,14 @@ function renderQuiz() {
 }
 
 $('#model-detail').addEventListener('click', event => {
+  const copy = event.target.closest('[data-copy-citation]');
+  if (copy) {
+    if (navigator.clipboard?.writeText) void navigator.clipboard.writeText(research(copy.dataset.copyCitation).citationText).then(() => toast('论文引用已复制。')).catch(() => toast('复制未完成，可以直接选中引用文字。'));
+    else toast('可以直接选中引用文字，或下载 BibTeX。');
+    return;
+  }
+  const download = event.target.closest('[data-download-bibtex]');
+  if (download) { downloadPaperCitation(download.dataset.downloadBibtex); return; }
   const tab = event.target.closest('[data-tab]');
   if (tab) {
     stopDiagram(); state.tab = tab.dataset.tab;

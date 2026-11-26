@@ -1,0 +1,11 @@
+# Bibliography, benchmark evidence and free backend setup
+
+The user approved creating a new NeuralBank Supabase project on the free tier, then asked for every architecture to have clear venue, citation information, corresponding paper, GitHub repository and benchmark scores, including via MCP. Preserve both requests.
+
+For all 64 entries, add a verified representative primary paper with its full author list, selected publication year, paper URL, DOI/arXiv identifiers, and a separate venue name/year/type/source. The selected year agrees with the venue; preserve an earlier preprint year separately. A representative paper need not be the origin of an architecture; keep the existing historical milestone notes. Distinguish preprints from formal proceedings and journals. Repository records identify author-official, reference implementation or third-party relationship and scope. Missing records remain explicit absences.
+
+Format readable citations and BibTeX from this data. Add dated, source-linked bibliometric snapshots using exact paper matching against public scholarly records. Do not approximate an unknown count, turn it into zero, or sum duplicate preprint/published records. Explain provider coverage and version merging. Citation counts are not model performance scores.
+
+Attach the same paper, repository, citation and exact model-linked benchmark records to machine search/detail/comparison/suggestion responses and public JSON. Each benchmark keeps its reported model variant, metric/unit/direction, protocol, conditions and source. Add no inferred scores. Website details should group paper/venue/citation/code clearly and retain the existing separate benchmark view.
+
+Backend setup must remain free and owner-controlled. The Supabase connector is not installed/connected. The user explicitly accepted the Supabase sign-in terms and authorized continuing with GitHub. A new NeuralBank Free organization now exists; the new-project form is ready with Americas, Data API enabled, automatic table grants disabled and default RLS enabled. Project creation is awaiting the user's database-password entry in Chrome and password-manager storage. Do not inspect or copy that credential, treat time passing as completion, or bind another service to the unavailable Sites project. Keep independent bibliography work moving during the handoff.

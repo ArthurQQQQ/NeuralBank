@@ -39,9 +39,9 @@ export function createNeuralBankServer() {
   const modelIds = [...new Set(taxonomy.categories.flatMap(category => category.architectureIds))].sort();
   const id = z.string().min(1).max(100).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use a canonical architecture ID from search_architectures.');
   const offset = z.number().int().min(0).max(1_000_000).optional();
-  const enumList = (values, description) => z.array(z.enum(values)).max(Math.min(values.length, 32)).describe(description).optional();
+  const enumList = (values, description) => z.array(z.enum(values)).max(Math.min(values.length, 20)).describe(description).optional();
   const server = new McpServer({ name: 'neuralbank', version: '1.0.0' }, {
-    instructions: 'Read-only public neural network architecture catalog. Begin with list_categories for supported filter IDs, then search or suggest, and inspect get_architecture or compare_architectures. Preserve references, limitations and caveats when presenting findings. Suggestions are deterministic constraint matches, not a performance ranking or proof of scientific novelty. Results describe teaching configurations, not downloadable trained weights. This server has no account, personal progress, submission, execution, training, or remote-fetch capabilities.',
+    instructions: 'Read-only public neural network architecture catalog. Begin with list_categories for supported filter IDs, then search or suggest, and inspect get_architecture or compare_architectures. Preserve references, limitations, primaryPaper, repositories, citation and caveats when presenting findings. primaryPaper.venue describes that publication version; a citation is a dated provider snapshot for that paper only, and null means unknown, never zero. Repository relationship and scope distinguish author releases from reference or third-party implementations; an empty array is not proof none exists. benchmarkResults retain the actual reportedModel, metric, evaluation protocol and source; they are not scores of the teaching diagram. Suggestions are deterministic constraint matches, not citation/performance rankings or proof of scientific novelty. Missing tags are not evidence of absence. This server has no account, personal progress, submission, execution, training, or remote-fetch capabilities.',
   });
 
   const tool = (name, description, inputSchema, query) => {
@@ -68,18 +68,22 @@ export function createNeuralBankServer() {
   };
 
   tool('list_categories',
-    'List NeuralBank architecture families, their member IDs, all valid task/mechanism/modality/output/trait/entity/level filter IDs and labels, and catalog caveats. Use these IDs in search and suggestions.',
+    'List NeuralBank architecture families and member IDs, valid task/mechanism/modality/output/trait/entity/level filters, publication venues/years/types, labels and catalog caveats. Use these values in search and suggestions.',
     z.object({}).strict(),
     () => taxonomy);
 
   tool('search_architectures',
-    'Search the curated public catalog by name, mechanism or teaching text and optional exact filters. Arrays are AND filters; axes are also AND. Order is stable canonical ID order, never a performance ranking. Each item includes primary references and limitations. Use offset=nextOffset to continue. Default limit 12; maximum 30.',
+    'Search the curated public catalog by architecture name, mechanism, teaching text, paper title/author, or repository URL and optional exact filters, including venue name, publication venueYear/type and hasRepository. hasRepository means any curated repository relationship, not necessarily author code. Arrays are AND filters; axes are also AND. Order is stable canonical ID order, never a citation/performance ranking. Each item retains primaryPaper with venue, repository relationships/scopes, citation snapshot (null if unknown), full benchmarkResults with reportedModel/metric/protocol/source, references and limitations. Use offset=nextOffset to continue. Default limit 12; maximum 30.',
     z.object({
       query: z.string().trim().max(300).optional(),
       category: z.enum(taxonomy.categories.map(category => category.id)).optional(),
       task: z.enum(axes.supportedTasks).optional(),
       level: z.enum(axes.levels).optional(),
       entityType: z.enum(axes.entityTypes).optional(),
+      venue: z.enum(axes.venues).optional(),
+      venueYear: z.number().int().min(1800).max(2100).optional(),
+      publicationType: z.enum(axes.publicationTypes).optional(),
+      hasRepository: z.boolean().optional(),
       mechanisms: enumList(axes.mechanisms, 'Require all listed mechanisms.'),
       inputModalities: enumList(axes.inputModalities, 'Require all listed input modalities.'),
       outputTypes: enumList(axes.outputTypes, 'Require all listed output types.'),
@@ -90,17 +94,17 @@ export function createNeuralBankServer() {
     args => searchArchitectures({ ...args, limit: args.limit ?? 12 }));
 
   tool('get_architecture',
-    'Read one architecture by canonical ID: teaching configuration, module/layer explanations, shapes, formulas, metadata, limitations, prerequisites, related models, benchmark associations and original source citations. Teaching sizes are not claims about all real implementations.',
+    'Read one architecture by canonical ID: teaching configuration, modules/shapes/formulas, metadata, limitations, prerequisites, related models, primaryPaper and publication venue, citation snapshot, repository relationships/scopes and original references. benchmarkResults identify the actual reportedModel with metric/protocol/source; an empty array means no curated result, not zero performance. Unknown citation count is null. Teaching sizes are not claims about real trained implementations.',
     z.object({ id }).strict(),
     args => getArchitecture(args.id));
 
   tool('compare_architectures',
-    'Compare 2–6 distinct canonical architecture IDs by mechanisms, tasks, modalities, qualitative tradeoffs and limitations, retaining source citations. This is a structural comparison, not a leaderboard; teaching configurations and benchmark settings can differ.',
+    'Compare 2–6 distinct canonical architecture IDs by mechanisms, tasks, modalities, qualitative tradeoffs and limitations. Each item retains primaryPaper/venue, citation snapshot, scoped repositories, full benchmarkResults and references. This is a structural comparison, not a citation or performance leaderboard. Benchmark numbers belong to their reportedModel and metric/protocol/source, not teaching diagrams; settings can differ.',
     z.object({ ids: z.array(id).min(2).max(6).refine(ids => new Set(ids).size === ids.length, 'Architecture IDs must be unique; remove duplicates.') }).strict(),
     args => compareArchitectures(args.ids));
 
   tool('suggest_architectures',
-    'Find architecture candidates matching a supported task and explicit qualitative constraints. Return match reasons, limitations and citations in stable ID order. Required tag arrays are exact AND filters; entityTypes is an allowlist; any matching excluded trait/mechanism removes a candidate. No measured best-model ranking, novelty guarantee, hardware guarantee or automatic experiment. Empty results mean the curated tags found no match. Default limit 6; maximum 12.',
+    'Find architecture candidates matching a supported task and explicit qualitative constraints. Return match reasons, limitations, primaryPaper/venue, citation snapshot, scoped repositories and benchmarkResults in stable ID order. Required tag arrays are exact AND filters; entityTypes is an allowlist; any explicitly matching excluded trait/mechanism removes a candidate. Missing tags are not evidence of absence. No citation/best-model ranking, novelty guarantee, hardware guarantee or automatic experiment. Empty results mean the curated tags found no match. Default limit 6; maximum 12.',
     z.object({
       task: z.enum(axes.supportedTasks),
       constraints: z.object({
@@ -122,7 +126,7 @@ export function createNeuralBankServer() {
   });
   server.registerResource('catalog', 'neuralbank://catalog', {
     title: 'NeuralBank public architecture index',
-    description: 'Index of public architecture IDs and per-model resource URIs, with original references and limitations. Read individual models for full teaching content; use paginated search for filtered results.',
+    description: 'Index of public architecture IDs and model URIs, primary papers/venues, scoped repositories, citation snapshots, full reported benchmark records, references and limitations. Read individual models for teaching content; use paginated search for filtered results.',
     mimeType: 'application/json',
   }, uri => resourceResult(uri, {
     schemaVersion: 1,
@@ -135,7 +139,13 @@ export function createNeuralBankServer() {
         name: item.name,
         fullName: item.fullName,
         category: item.category,
+        year: item.year,
+        yearNote: item.yearNote,
         resourceUri: `neuralbank://model/${item.id}`,
+        primaryPaper: item.primaryPaper,
+        repositories: item.repositories,
+        citation: item.citation,
+        benchmarkResults: item.benchmarkResults,
         references: item.references,
         limitations: item.limitations,
       };

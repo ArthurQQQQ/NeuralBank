@@ -66,6 +66,14 @@ npm run check:submission -- path/to/submission.json
 
 界面使用系统字体和语义配色，支持浅色、深色与跟随系统；支持键盘、窄屏和减少动态效果等偏好。
 
+## 论文、代码与引用
+
+64 个条目均有代表主论文的完整作者、标题、出版年份、出版类型和来源；DOI、arXiv 标识按已核实情况提供，支持文本引用与 BibTeX。所选论文的发表年份与模型历史节点分开：例如 ViT 的预印本是 2020 年，正式会议是 ICLR 2021；自编码器选用的 2006 年代表论文也不表示它始于 2006 年。
+
+代码仓库明确区分作者官方发布、参考实现与第三方实现，并说明覆盖的版本和用途；空列表表示尚未核验相关 GitHub 发布。链接不构成复现证明。
+
+截至 **2026-11-26**，61 个条目有带来源与获取日期的 OpenAlex 被引次数快照；RBF、GPT、GIN 的次数仍未知，**未知不是零**。次数可能聚合预印本与正式版本，反映数据源覆盖和论文传播，不构成模型性能、论文质量或跨领域的统一排名。维护规则和刷新命令见 [书目与引用维护](docs/bibliography.md)。
+
 ## 个人学习库
 
 掌握状态由用户手动标注，不因浏览或答对一道题自动完成。访客继续使用当前浏览器的 `neuralbank-learned` 模型 ID 数组，保留原有进度。
@@ -112,6 +120,8 @@ Benchmark 成绩绑定具体模型变体、指标和评估协议，保留配置�
 | `src/models.js`、`src/additional-models.js`、`src/venue-models.js`、`src/expanded-*-models.js` | 架构内容、教学配置、前置模型与原始来源 |
 | `src/diagrams.js`、`src/expanded-diagrams.js`、`src/taxonomy.js` | 原创 SVG 图与家族、层级定义 |
 | `src/benchmarks.js` | 正式收录的任务、指标与成绩 |
+| `src/bibliography.js`、`src/bibliography-foundation.js`、`src/bibliography-expanded.js` | 64 条代表论文、作者、正式出版信息、仓库关系与引用导出 |
+| `src/citation-snapshots.js`、`src/citation-supplements.js`、`scripts/update-citations.mjs` | 带来源和日期的引用快照、人工核对补充与显式刷新工具 |
 | `src/learning-progress.js`、`src/learning-sync.js` | 访客记录、账户缓存与同步 |
 | `src/architecture-metadata.js`、`src/architecture-catalog.js` | 多轴分类与共享只读查询 |
 | `mcp/`、`docs/mcp.md` | 官方 SDK MCP 服务、协议测试与接入说明 |

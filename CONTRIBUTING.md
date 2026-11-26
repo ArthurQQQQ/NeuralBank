@@ -92,11 +92,29 @@ npm --prefix mcp test
 
 在 `src/benchmarks.js` 维护任务、指标定义与具体模型成绩，保留 `reportedModel`、`configuration`、`protocol`、`conditions`、`comparisonKey`、`source` 和 `notes`。原论文表格需能定位；指标明确单位和高低方向。模型家族不能自动继承某个配置的成绩；外部对照模型可使用 `modelId: null`。
 
+每条成绩的 `source` 独立指向实际报告该数值的论文与表格，不自动套用架构的代表主论文。主论文的出版信息、代码仓库或被引次数都不能替代具体评估协议；不同变体和条件不得仅凭模型 ID 合并比较。
+
 ```sh
 node scripts/validate-benchmarks.mjs
 ```
 
 不要把 `examples/submissions/` 的虚构 fixture 或待审核自报直接导入 `benchmarkResults`。正式成绩的数据结构与投稿 JSON 是两种用途不同的记录，维护者应在审查后明确转换。
+
+### 论文书目、仓库与被引次数
+
+每个模型 ID 都须在 `src/bibliography-foundation.js` 或 `src/bibliography-expanded.js` 中提供代表主论文。核对全部作者、标题、所选版本的出版年份、DOI / arXiv 标识及正式 venue；模型的历史年份与预印本年份另行保留。arXiv、投稿页面或作者单位不自动证明会议接收。文献格式由 `src/bibliography.js` 统一导出，不在界面或 MCP 中维护另一份作者与年份。
+
+GitHub 链接填写 `relationship` 与 `scope`：`author-official` 需要论文或作者发布的归属证据，`reference-implementation` 和 `third-party` 不得冒称原论文代码。注明后续版本、归档和示例范围；未核验时可留空数组。
+
+被引次数只接收有准确 work、来源 URL 和 `retrievedAt` 的快照。没有可靠匹配时保持 `null`，不补零、不取搜索结果中最高次数；即使 DOI / arXiv 标识匹配，标题污染或版本不明也须拒绝。当前 61 条 OpenAlex 快照与 3 条未知的具体范围、人工补充及更新方式见 [书目维护文档](docs/bibliography.md)。
+
+```sh
+node scripts/update-citations.mjs --help
+node scripts/update-citations.mjs --output /tmp/neuralbank-citation-snapshots.review.js
+node --test server/bibliography.test.mjs
+```
+
+刷新会访问公开 OpenAlex API；先审查生成差异再更新正式快照，并运行测试与构建。不要改写获取日期来伪装刷新成功，也不要把引用次数转成架构推荐的总排名。
 
 ### 学习进度与持久化
 

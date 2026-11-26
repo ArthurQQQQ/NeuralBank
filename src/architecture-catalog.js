@@ -2,6 +2,7 @@ import { models as sourceModels } from './models.js';
 import * as sourceTaxonomy from './taxonomy.js';
 import { benchmarks as sourceBenchmarks, benchmarkResults as sourceBenchmarkResults } from './benchmarks.js';
 import { architectureMetadata, architectureAxes, architectureMetadataScope } from './architecture-metadata.js';
+import { bibliography, getBibliography, validateBibliography, publicationTypes } from './bibliography.js';
 
 const SCHEMA_VERSION = 1;
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -14,7 +15,9 @@ const caveats = [
   architectureMetadataScope.evidence,
   architectureMetadataScope.absence,
   '比较与建议仅展示机制匹配、理由和局限；按稳定ID排序，不提供主观最佳总排名或跨协议性能排名。',
-  'benchmarkIds只链接目录中已收录的论文结果；成绩属于原文具体训练配置，不属于缩略教学图。'
+  'benchmarkIds及benchmarkResults只链接已收录的论文结果；成绩属于原文具体训练配置，不属于缩略教学图。成绩source可以不同于架构代表论文，不能用主论文仓库代替成绩的复现材料。',
+  'primaryPaper是明确选择的代表文献，不一定是架构最早起源；其year与venue.year对应所选发表版本，preprintYear另列。旧model.year保留历史教学节点。',
+  '引用次数是带来源与日期的数据库快照，可能合并预印本与发表版本；未知为null。仓库关系与scope单列，不把参考实现冒充论文原代码。'
 ];
 
 export class CatalogQueryError extends Error {
@@ -72,17 +75,25 @@ export function createArchitectureCatalog({ models, taxonomy, benchmarks, benchm
   const categoryRows = clone(taxonomy.categories);
   const benchmarkRows = clone(benchmarks);
   const literatureResults = clone(benchmarkResults);
+  validateBibliography(bibliography, sourceModels);
+  const canonicalPapers = Object.fromEntries(sourceModels.map(model => [model.id, getBibliography(model.id)]));
+  validateBibliography(canonicalPapers, sourceModels);
+  const paperById = new Map(rows.map(model => [model.id, canonicalPapers[model.id]]));
   const paths = clone(taxonomy.studyPaths || []);
   const byId = new Map(rows.map(model => [model.id, model]));
   if (byId.size !== rows.length || rows.some(model => typeof model.id !== 'string' || !model.id)) fail('CATALOG_INVALID', '模型ID必须唯一且非空。', '/models', 500);
   const missing = rows.filter(model => !Object.hasOwn(info, model.id)).map(model => model.id);
   const extra = Object.keys(info).filter(id => !byId.has(id));
   if (missing.length || extra.length) fail('CATALOG_INCOMPLETE', `metadata覆盖不一致；缺失：${missing.join(', ') || '无'}；未知：${extra.join(', ') || '无'}。`, '/metadata', 500);
+  if (rows.some(model => !paperById.get(model.id))) fail('CATALOG_INCOMPLETE', '文献库缺少模型ID。', '/bibliography', 500);
   const axes = {
     supportedTasks: architectureAxes.tasks.map(item => item.id), mechanisms: architectureAxes.mechanisms.map(item => item.id),
     inputModalities: architectureAxes.inputModalities.map(item => item.id), outputTypes: architectureAxes.outputTypes.map(item => item.id),
     traits: architectureAxes.traits.map(item => item.id), entityTypes: architectureAxes.entityTypes.map(item => item.id),
-    levels: ['入门', '进阶', '深入']
+    levels: ['入门', '进阶', '深入'],
+    venues: unique([...paperById.values()].map(record => record.primaryPaper.venue.name)).sort(),
+    venueYears: unique([...paperById.values()].map(record => record.primaryPaper.venue.year)).sort((a,b) => a-b),
+    publicationTypes: [...publicationTypes]
   };
   const categoriesById = new Map(categoryRows.map(category => [category.id, category]));
   if (categoriesById.size !== categoryRows.length) fail('CATALOG_INVALID', '分类ID必须唯一。', '/taxonomy/categories', 500);
@@ -122,18 +133,22 @@ export function createArchitectureCatalog({ models, taxonomy, benchmarks, benchm
   };
   const limitations = model => unique([...(model.limitations || []), ...info[model.id].tradeoffs, model.pitfall].filter(Boolean));
   const benchmarkIds = id => unique(literatureResults.filter(result => result.modelId === id).map(result => result.benchmarkId)).sort();
+  const reportedBenchmarks = id => literatureResults.filter(result => result.modelId === id).map(result => {
+    const definition = benchmarkById.get(result.benchmarkId);
+    return { ...result, benchmarkName: definition.name, metric: { name: definition.metric, unit: definition.unit, direction: definition.direction }, benchmarkProtocolNote: definition.protocolNote || null, configurationScope: 'reported-variant-not-teaching-example' };
+  });
   const shortLink = id => ({ id, name: byId.get(id).name, category: byId.get(id).category });
   const summary = model => ({
     id: model.id, name: model.name, fullName: model.fullName, category: model.category,
-    categoryName: categoriesById.get(model.category).name, level: model.level, year: model.year,
+    categoryName: categoriesById.get(model.category).name, level: model.level, year: model.year, yearNote: model.yearNote,
     tagline: model.tagline, metadata: info[model.id], prerequisites: model.prerequisites,
     relatedModelIds: info[model.id].relatedModelIds, references: model.references,
-    limitations: limitations(model), benchmarkIds: benchmarkIds(model.id)
+    limitations: limitations(model), benchmarkIds: benchmarkIds(model.id), benchmarkResults: reportedBenchmarks(model.id), ...paperById.get(model.id)
   });
   const detail = model => ({
     ...model, categoryName: categoriesById.get(model.category).name, metadata: info[model.id], limitations: limitations(model),
     prerequisiteModels: model.prerequisites.map(shortLink), relatedModels: info[model.id].relatedModelIds.map(shortLink),
-    benchmarkIds: benchmarkIds(model.id)
+    benchmarkIds: benchmarkIds(model.id), benchmarkResults: reportedBenchmarks(model.id), ...paperById.get(model.id)
   });
   const categoryDocument = () => categoryRows.map(category => {
     const members = rows.filter(model => model.category === category.id).map(model => model.id);
@@ -147,12 +162,17 @@ export function createArchitectureCatalog({ models, taxonomy, benchmarks, benchm
   function listCatalogCategories() {
     return envelope({ categories: categoryDocument(), axes, axisLabels: architectureAxes });
   }
-  const searchKeys = ['query', 'category', 'task', 'level', 'entityType', 'mechanisms', 'inputModalities', 'outputTypes', 'traits', 'limit', 'offset'];
+  const searchKeys = ['query', 'category', 'task', 'level', 'entityType', 'mechanisms', 'inputModalities', 'outputTypes', 'traits', 'venue', 'venueYear', 'publicationType', 'hasRepository', 'limit', 'offset'];
   function normalizeFilters(filters) {
     objectArgument(filters, searchKeys, '/filters');
     const normalized = {};
     if (Object.hasOwn(filters, 'query')) normalized.query = stringArgument(filters.query, '/filters/query', { allowEmpty: true });
-    for (const [key, allowed] of [['category', [...categoriesById.keys()]], ['task', axes.supportedTasks], ['level', axes.levels], ['entityType', axes.entityTypes]]) if (Object.hasOwn(filters, key)) normalized[key] = enumArgument(filters[key], allowed, `/filters/${key}`);
+    for (const [key, allowed] of [['category', [...categoriesById.keys()]], ['task', axes.supportedTasks], ['level', axes.levels], ['entityType', axes.entityTypes], ['venue', axes.venues], ['publicationType', axes.publicationTypes]]) if (Object.hasOwn(filters, key)) normalized[key] = enumArgument(filters[key], allowed, `/filters/${key}`);
+    if (Object.hasOwn(filters, 'venueYear')) normalized.venueYear = integerArgument(filters.venueYear, 1800, 2100, '/filters/venueYear');
+    if (Object.hasOwn(filters, 'hasRepository')) {
+      if (typeof filters.hasRepository !== 'boolean') fail('INVALID_ARGUMENT', 'hasRepository必须是boolean。', '/filters/hasRepository');
+      normalized.hasRepository = filters.hasRepository;
+    }
     for (const key of ['mechanisms', 'inputModalities', 'outputTypes', 'traits']) if (Object.hasOwn(filters, key)) normalized[key] = arrayArgument(filters[key], axes[key], `/filters/${key}`);
     normalized.limit = Object.hasOwn(filters, 'limit') ? integerArgument(filters.limit, 1, 100, '/filters/limit') : 20;
     normalized.offset = Object.hasOwn(filters, 'offset') ? integerArgument(filters.offset, 0, Number.MAX_SAFE_INTEGER, '/filters/offset') : 0;
@@ -160,14 +180,21 @@ export function createArchitectureCatalog({ models, taxonomy, benchmarks, benchm
   }
   const searchableText = model => [model.id, model.name, model.fullName, model.tagline, model.description, model.learningGoal,
     ...info[model.id].mechanisms, ...info[model.id].supportedTasks, ...info[model.id].representativeUseCases,
-    ...info[model.id].mechanisms.map(id => architectureAxes.mechanisms.find(item => item.id === id).label)
+    ...info[model.id].mechanisms.map(id => architectureAxes.mechanisms.find(item => item.id === id).label),
+    paperById.get(model.id).primaryPaper.title, ...paperById.get(model.id).primaryPaper.authors,
+    paperById.get(model.id).primaryPaper.venue.name, ...paperById.get(model.id).repositories.map(repo => repo.url)
   ].join(' ').normalize('NFKC').toLowerCase();
   function matches(model, filters) {
     const data = info[model.id];
+    const paper = paperById.get(model.id);
     if (filters.category && model.category !== filters.category) return false;
     if (filters.level && model.level !== filters.level) return false;
     if (filters.entityType && data.entityType !== filters.entityType) return false;
     if (filters.task && !data.supportedTasks.includes(filters.task)) return false;
+    if (filters.venue && paper.primaryPaper.venue.name !== filters.venue) return false;
+    if (filters.venueYear !== undefined && paper.primaryPaper.venue.year !== filters.venueYear) return false;
+    if (filters.publicationType && paper.primaryPaper.venue.type !== filters.publicationType) return false;
+    if (filters.hasRepository !== undefined && Boolean(paper.repositories.length) !== filters.hasRepository) return false;
     for (const key of ['mechanisms', 'inputModalities', 'outputTypes', 'traits']) if (filters[key]?.some(value => !data[key].includes(value))) return false;
     return !filters.query || filters.query.normalize('NFKC').toLowerCase().split(/\s+/u).filter(Boolean).every(token => searchableText(model).includes(token));
   }
