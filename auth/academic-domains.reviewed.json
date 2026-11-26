@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "purpose": "INITIAL_REVIEWED_EXACT_ACADEMIC_EMAIL_DOMAINS",
+  "coverageNote": "Initial coverage of 15 institutions across 9 countries, using 17 explicitly documented email domains. This is not a worldwide university list and does not cover every mailbox domain of these institutions.",
+  "reviewNotes": [
+    "Each approved domain is an exact match with allowSubdomains=false. No department, student, alumni, or other subdomain is implicitly approved.",
+    "Evidence concerns institutional email use, not merely the institution's website hostname. Mailbox possession does not prove current student enrollment; some institutional mailboxes also serve staff, affiliates, or alumni.",
+    "Only domains accepted by the pinned public-candidate importer are included. Officially documented domains absent from that candidate snapshot require a separate reviewed administrator migration; this manifest does not override that restriction.",
+    "UNC's official clinical-research guidance, page 8 under Encrypted emails, explicitly describes the unc.edu email network and a generic sender at that exact domain. Approval does not infer an email domain from UNC's Active Directory login realm.",
+    "Preparing this manifest or its SQL does not enable SMTP delivery or apply any cloud database change."
+  ],
+  "domains": [
+    {
+      "domain": "unc.edu",
+      "institution": "The University of North Carolina at Chapel Hill",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://nrp.tracs.unc.edu/wp-content/uploads/NRP_COVID-19_20200414.pdf",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "mit.edu",
+      "institution": "Massachusetts Institute of Technology",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://ist.mit.edu/about/policies/useraccounts",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "stanford.edu",
+      "institution": "Stanford University",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://uit.stanford.edu/emailcalendar",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "berkeley.edu",
+      "institution": "University of California, Berkeley",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://bconnected.berkeley.edu/node/297",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "ucsd.edu",
+      "institution": "University of California San Diego",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://blink.ucsd.edu/technology/email/tasks/help.html",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "cam.ac.uk",
+      "institution": "University of Cambridge",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://help.uis.cam.ac.uk/email",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "ethz.ch",
+      "institution": "ETH Zurich",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://readme.phys.ethz.ch/account/",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "epfl.ch",
+      "institution": "École polytechnique fédérale de Lausanne (EPFL)",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://wiki.epfl.ch/help-gdrive-en/authentification",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "uwaterloo.ca",
+      "institution": "University of Waterloo",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://uwaterloo.ca/information-systems-technology/about/policies-standards-and-guidelines/email/statement-official-student-email-address",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "pku.edu.cn",
+      "institution": "Peking University",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://its.pku.edu.cn/service_1_mail.jsp",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "stu.pku.edu.cn",
+      "institution": "Peking University",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://its.pku.edu.cn/service_1_mail.jsp",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "uni.sydney.edu.au",
+      "institution": "The University of Sydney",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://www.sydney.edu.au/students/it-support/student-it/email-wireless.html",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "anu.edu.au",
+      "institution": "The Australian National University",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://services.anu.edu.au/information-technology/email/email-addresses-lists",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "aucklanduni.ac.nz",
+      "institution": "The University of Auckland",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://www.auckland.ac.nz/en/about-us/about-the-university/policy-hub/enabling-environment/digital/use/student-email-policy.html",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "myuct.ac.za",
+      "institution": "University of Cape Town",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://icts.uct.ac.za/services/email-uct",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "uct.ac.za",
+      "institution": "University of Cape Town",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://icts.uct.ac.za/services/email-uct",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    },
+    {
+      "domain": "iitb.ac.in",
+      "institution": "Indian Institute of Technology Bombay",
+      "allowSubdomains": false,
+      "evidenceUrl": "https://www.civil.iitb.ac.in/help/faq.html",
+      "reviewedBy": "NeuralBank-maintainers",
+      "reviewedAt": "2026-11-26T23:30:50Z"
+    }
+  ]
+}

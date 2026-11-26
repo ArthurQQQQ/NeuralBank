@@ -77,6 +77,8 @@ returning-user template leaves new users with a link they cannot enter as a code
 The API named `signInWithOtp` sends a link by default; changing these templates
 is necessary for the UI's code-entry flow. Keep email confirmation enabled and
 password/anonymous sign-up methods disabled if they are not offered by this app.
+Keep new-user registration and the Email provider enabled: GitHub first sign-in
+and email OTP's `shouldCreateUser: true` need them.
 The adapter verifies the entered token using the SDK, then checks the account's
 trusted database eligibility. See [passwordless email](https://supabase.com/docs/guides/auth/auth-email-passwordless)
 and [Auth email templates](https://supabase.com/docs/guides/auth/auth-email-templates).
@@ -87,6 +89,10 @@ is not a public-school-email delivery solution. Configure a custom SMTP provider
 and an authorized From address, including the provider's required sender-domain
 DNS records. A custom SMTP project initially has a 30-message/hour limit, which
 must be reviewed against expected traffic and the email provider's own limits.
+For newly created Free projects, configure custom SMTP **before** editing these
+templates: since 2026-06-03, projects using the default SMTP cannot customize Auth
+email templates. Custom SMTP restores template editing without a plan upgrade.
+See the [official Free-tier template change](https://supabase.com/changelog/46599-changes-to-email-template-customisation-on-free-tier).
 Do not enable `emailEnabled` before delivery to real, independent institution
 mailboxes succeeds. See [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
 and [Auth rate limits](https://supabase.com/docs/guides/auth/rate-limits).
@@ -136,11 +142,24 @@ Write an explicit reviewed manifest (synthetic illustration only):
 }
 ```
 
+An initial reviewed list is available in
+[`auth/academic-domains.reviewed.json`](../auth/academic-domains.reviewed.json):
+17 exact email domains for 15 institutions in 9 countries, including UNC.
+Every entry links official email-domain evidence and disables implicit subdomain
+approval. This is initial coverage, not a worldwide or exhaustive mailbox list.
+The list alone enables no accounts: migration `0001` still starts with zero
+approved domains until an administrator explicitly imports reviewed SQL. SMTP
+delivery and the email feature flag must also be configured and tested.
+
 Then prepare SQL for review and a separate administrator application:
 
 ```sh
 node auth/import-academic-domains.mjs --approved /tmp/reviewed-domains.json --output /tmp/reviewed-domains.sql
 ```
+
+Use `--approved auth/academic-domains.reviewed.json` to generate the initial list.
+The generated SQL also includes the pinned SWOT abuse blocks. The upstream data
+license is retained in [`auth/SWOT-LICENSE.txt`](../auth/SWOT-LICENSE.txt).
 
 The script never applies SQL. It accepts only explicitly reviewed, nonblocked
 candidates; a domain absent from SWOT requires separate official evidence and a
