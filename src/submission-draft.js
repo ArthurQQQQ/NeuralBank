@@ -1,8 +1,8 @@
 // A check applies to one exact editor revision. A late response never validates
 // newer text, and browser-only success never claims a server check.
 export class SubmissionDraft {
-  constructor({validate,remoteCheck,onChange=()=>{}}) {
-    this.validate=validate; this.remoteCheck=remoteCheck; this.onChange=onChange;
+  constructor({validate,remoteCheck,onChange=()=>{},requireServer=true}) {
+    this.validate=validate; this.remoteCheck=remoteCheck; this.onChange=onChange; this.requireServer=requireServer;
     this.text=''; this.revision=0; this.checkedRevision=-1; this.submittedRevision=-1;
     this.report=null; this.checking=false; this.serial=0;
   }
@@ -10,7 +10,7 @@ export class SubmissionDraft {
     this.text=String(text); this.revision++; this.serial++;
     this.report=null; this.checkedRevision=-1; this.checking=false; this.onChange();
   }
-  get canSubmit() { return Boolean(!this.checking && this.report?.valid && this.report.serverChecked && this.checkedRevision===this.revision && this.submittedRevision!==this.revision); }
+  get canSubmit() { return Boolean(!this.checking && this.report?.valid && (this.report.serverChecked || !this.requireServer) && this.checkedRevision===this.revision && this.submittedRevision!==this.revision); }
   get checkedValue() { return this.canSubmit ? this.report.value : null; }
   markSubmitted(revision) { this.submittedRevision=revision; this.onChange(); }
   async check() {
@@ -26,6 +26,7 @@ export class SubmissionDraft {
     }
     const local=this.validate(value);
     if(!local.valid) { this.report={...local,serverChecked:false}; this.onChange(); return this.report; }
+    if(!this.requireServer) { this.report={...local,serverChecked:false}; this.checkedRevision=revision; this.onChange(); return this.report; }
     this.checking=true; this.report=null; this.onChange();
     try {
       const response=await this.remoteCheck(value);

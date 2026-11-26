@@ -2,9 +2,9 @@
 
 把神经网络架构整理成可以探索的学习图谱：看结构与张量维度，理解模块作用、前置概念和局限，再用小测验复习。个人学习库记录待学习与已掌握状态；贡献入口用于提出模型编辑建议和自报 Benchmark 成绩。
 
-公开源码仓库：[ArthurQQQQ/NeuralBank](https://github.com/ArthurQQQQ/NeuralBank)。项目提供 MIT 许可、贡献约定、严格 JSON 格式检查和 PR 工作流，源码随本次提交推送。
+公开源码仓库：[ArthurQQQQ/NeuralBank](https://github.com/ArthurQQQQ/NeuralBank)。项目提供 MIT 许可、贡献约定、严格 JSON 格式检查和 PR 工作流。
 
-托管网站尚未发布本轮功能：已有 Sites 项目接口返回 `Sites project not found`，在线投稿服务尚未上线；目前可在本地预览、验证格式并通过源码仓库提交 PR。
+GitHub Pages 已配置，平台返回的静态版地址是 [arthurqqqq.github.io/NeuralBank](https://arthurqqqq.github.io/NeuralBank/)，部署由 Pages 工作流执行，状态见仓库 Actions。原 Sites 项目仍返回 `Sites project not found`，服务端登录与在线投稿 API 尚未恢复。静态版提供浏览器学习记录、格式检查、JSON 下载及 PR 贡献路径。
 
 ## 本地运行与验证
 
@@ -20,6 +20,7 @@ npm run dev
 npm run check:submission
 npm test
 npm run build
+npm run build:static
 ```
 
 格式检查器默认检查 `examples/submissions/` 的合法虚构样例，以及 `submissions/` 中存在的贡献 JSON。也可以指定文件或目录：
@@ -28,7 +29,20 @@ npm run build
 npm run check:submission -- path/to/submission.json
 ```
 
-这些命令验证本地文件、测试和构建结果；不会向生产网站投稿，也不会执行 JSON 中记录的复现命令。`dist/` 是生成结果，请修改源文件。
+这些命令验证本地文件、测试和构建结果；不会向生产网站投稿，也不会执行 JSON 中记录的复现命令。`npm run build` 生成服务端版本 `dist/server/index.js`；`npm run build:static` 生成静态版本 `dist-static/`。两个目录都是生成结果，请修改源文件。
+
+## 静态公开版与服务端版本
+
+| 能力 | GitHub Pages 静态版 | 服务端版本 |
+| --- | --- | --- |
+| 架构图、学习路径、Benchmark 浏览 | 支持 | 支持 |
+| 当前浏览器的学习进度 | 支持 | 支持 |
+| 账户登录与跨设备同步 | 不提供 | 需要受信平台身份与数据库 |
+| 浏览器内严格 JSON 格式检查 | 支持 | 支持 |
+| 下载 JSON，向源码仓库提交 PR | 支持 | 支持 |
+| HTTP 投稿与待审核队列 | 不提供 | 需要可用的投稿 API 与存储 |
+
+静态版不发送服务端投稿请求，也不把浏览器进度描述为云同步。它可由普通静态服务器托管；服务端版本继续保留账户及数据库 API，供后续部署。
 
 ## 架构与学习路径
 
@@ -51,7 +65,9 @@ npm run check:submission -- path/to/submission.json
 
 掌握状态由用户手动标注，不因浏览或答对一道题自动完成。访客继续使用当前浏览器的 `neuralbank-learned` 模型 ID 数组，保留原有进度。
 
-托管环境通过 `GET /api/session` 确认平台身份；`GET/PUT /api/learning` 仅访问当前账户的记录。客户端按稳定账户 ID 隔离缓存，保存每个模型的待同步意图，并基于服务器版本合并多设备冲突。访客记录只在明确选择“合并到我的学习库”后导入账户。
+GitHub Pages 版只使用上述浏览器记录，不显示云登录或调用个人学习库 API。
+
+服务端托管环境通过 `GET /api/session` 确认平台身份；`GET/PUT /api/learning` 仅访问当前账户的记录。客户端按稳定账户 ID 隔离缓存，保存每个模型的待同步意图，并基于服务器版本合并多设备冲突。访客记录只在明确选择“合并到我的学习库”后导入账户。
 
 界面区分本地保存、加载、同步、成功和失败；浏览器存储不可用时说明记录仅在当前会话有效。真实登录和跨设备同步须在可用的托管环境验收。
 
@@ -64,7 +80,7 @@ Benchmark 成绩绑定具体模型变体、指标和评估协议，保留配置�
 - **模型编辑建议**：修改现有模型允许编辑的教学文字，并提供原始来源与理由。提案不直接执行代码或替换 SVG。
 - **Benchmark 自报**：说明准确模型版本、数据集划分、评估协议、配置、运行环境、复现命令和日志。完整提交格式见 [Schema](schemas/submission.schema.json)。
 
-流程是：填写或编辑 JSON，运行格式检查，提交为待审核提案，再由维护者核对并通过 PR 收录。浏览器可下载 JSON；把文件放入 `submissions/`，向 [NeuralBank 仓库](https://github.com/ArthurQQQQ/NeuralBank)提交 PR。在线提交服务发布后，网站提案也仅进入待审核队列，不直接修改正式数据。
+流程是：填写或编辑 JSON，运行格式检查，下载为文件，再由维护者核对并通过 PR 收录。把文件放入 `submissions/`，向 [NeuralBank 仓库](https://github.com/ArthurQQQQ/NeuralBank)提交 PR。GitHub Pages 版不会向服务器发送提案；服务端投稿服务恢复后，网站提案也仅进入待审核队列，不直接修改正式数据。
 
 **格式合法、审核通过、结果可复现是不同状态。** 检查器只验证结构与字段约束，不运行实验、不抓取证据链接、不证明成绩真实。自报成绩初始为「待审核／复现未验证」；提交者不能在 JSON 中自行设置审核或验证结论。缺少权重文件可仍满足格式约束，但不能据此宣称完成复现。
 
@@ -81,8 +97,11 @@ Benchmark 成绩绑定具体模型变体、指标和评估协议，保留配置�
 | `schemas/submission.schema.json`、`scripts/check-submission.mjs` | 贡献格式与本地检查器 |
 | `server/`、`drizzle/` | API、持久化与数据库迁移 |
 | `.github/workflows/ci.yml` | PR 的格式、测试与构建检查 |
+| `.github/workflows/pages.yml` | 默认分支的静态公开版构建与 Pages 部署 |
 
-构建将前端资源与 API 打包进 `dist/server/index.js`。Sites 托管配置位于 `.openai/hosting.json`，使用逻辑 D1 绑定 `DB`，不设置 `static`。已有迁移不可改写。Fork 的 CI 不部署、不调用生产投稿 API、不注入生产凭据；自行托管时由维护者配置自己的项目与数据库，不复用原站点身份。
+Pages 工作流只在本仓库默认分支的推送或手动触发时运行，先完成测试、投稿检查与静态构建，再上传 `dist-static/` 并部署；不在 PR 中部署。PR CI 继续使用只读权限，不调用生产投稿 API，也不注入生产凭据。
+
+服务端构建将前端资源与 API 打包进 `dist/server/index.js`。Sites 配置位于 `.openai/hosting.json`，使用逻辑 D1 绑定 `DB`，不设置 `static`。已有迁移不可改写；自行托管服务端版本时配置自己的项目与数据库，不复用原站点身份。
 
 ## 许可与来源
 

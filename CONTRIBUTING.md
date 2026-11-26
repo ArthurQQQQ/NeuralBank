@@ -2,11 +2,11 @@
 
 可以纠正模型教学内容，也可以提交带版本与证据的 Benchmark 自报。提案先通过格式检查，再进入人工审核；网站表单不会直接改写正式模型或成绩。
 
-公开源码仓库是 [ArthurQQQQ/NeuralBank](https://github.com/ArthurQQQQ/NeuralBank)，可通过 PR 提交贡献。托管网站的在线投稿服务尚未发布；目前先在本地填写、验证并下载 JSON，再提交到仓库。
+公开源码仓库是 [ArthurQQQQ/NeuralBank](https://github.com/ArthurQQQQ/NeuralBank)，可通过 PR 提交贡献。GitHub Pages 静态版提供浏览器格式检查和 JSON 下载，不提供服务端投稿或云登录；平台返回的地址是 [arthurqqqq.github.io/NeuralBank](https://arthurqqqq.github.io/NeuralBank/)，部署由 Pages 工作流执行，状态见仓库 Actions。服务端 API 版本保留在仓库中，原 Sites 项目仍不可用。
 
 ## 从网站或 JSON 开始
 
-1. 在模型详情提出编辑建议，或在 Benchmark 入口填写自报成绩。
+1. 在静态版或本地预览的模型详情提出编辑建议，或在 Benchmark 入口填写自报成绩。
 2. 运行浏览器中的格式检查，按字段错误修改，再下载 JSON。
 3. 也可从 `examples/submissions/model-edit.valid.json` 或 `examples/submissions/benchmark-result.valid.json` 开始填写。这两个文件是虚构测试样例；请用真实内容替换，不把样例当作成绩投稿。
 4. 在本地运行同一检查器：
@@ -15,13 +15,14 @@
    npm run check:submission -- path/to/submission.json
    ```
 
-5. 将 JSON 放到 `submissions/` 下，使用独立文件名，向 [NeuralBank 仓库](https://github.com/ArthurQQQQ/NeuralBank)提交 PR。在线投稿服务发布后，也可以发送到待审核队列。讨论 Issue 本身不运行格式检查。
+5. 将 JSON 放到 `submissions/` 下，使用独立文件名，向 [NeuralBank 仓库](https://github.com/ArthurQQQQ/NeuralBank)提交 PR。静态版不会发送 HTTP 投稿；服务端 API 恢复后，在线提案也只进入待审核队列。讨论 Issue 本身不运行格式检查。
 6. PR 运行下面的检查，由维护者核对来源、协议和内容后决定是否收录：
 
    ```sh
    npm run check:submission
    npm test
    npm run build
+   npm run build:static
    ```
 
 检查器支持多个文件或递归目录；不传参数时检查 `examples/submissions/` 与存在的 `submissions/`。任何 JSON 不合法都会使检查失败。Schema 的确切字段与枚举以 [submission.schema.json](schemas/submission.schema.json) 为准；未知字段和未知嵌套字段会被拒绝，不能靠增加一个字段绕过必填要求。
@@ -87,7 +88,7 @@ node scripts/validate-benchmarks.mjs
 
 ### 学习进度与持久化
 
-保留已有模型 ID 和访客存储键 `neuralbank-learned`，新增架构不能清空旧进度。家族调整只改变归类，不改变掌握状态。访客本地保存不能描述为账户同步。
+保留已有模型 ID 和访客存储键 `neuralbank-learned`，新增架构不能清空旧进度。家族调整只改变归类，不改变掌握状态。静态版只保存本地进度，不显示云登录或向服务端 POST；访客本地保存不能描述为账户同步。
 
 账户同步由 `src/learning-sync.js` 与 `/api/learning` 负责：身份来自受信平台；浏览器缓存按稳定用户 ID 隔离；待同步操作、版本冲突和账户切换都需要保留保护。请求中的账户头只作为一致性前提，不能用来授予身份。访客数据只在明确操作后导入账户。
 
@@ -96,5 +97,7 @@ node scripts/validate-benchmarks.mjs
 ## CI 与许可
 
 PR CI 使用普通 `pull_request` 事件和只读 `contents` 权限。它只运行本地格式检查、测试和构建，不部署、不访问生产投稿 API、不注入生产凭据，也不执行 JSON 内的命令。不要改为使用 `pull_request_target` 运行外部贡献代码。
+
+静态发布由独立的 `.github/workflows/pages.yml` 负责，仅允许本仓库默认分支部署。构建任务保留只读权限；`pages: write` 与 `id-token: write` 只授予部署任务。`npm run build:static` 的产物是 `dist-static/`，不能混入服务端 API、个人记录或数据库文件。维护界面时同时检查项目路径下的相对资源链接。
 
 本项目原创代码、图示和说明使用 [MIT License](LICENSE)。新增第三方材料必须保留其来源和相应许可；论文、数据集、模型权重及链接内容不会因出现在本项目中而改成 MIT。

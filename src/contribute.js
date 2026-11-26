@@ -6,7 +6,7 @@ const q = selector => document.querySelector(selector);
 const json = value => JSON.stringify(value,null,2);
 const safeHref = value => { try {const url=new URL(value); return url.protocol==='https:' && !url.username && !url.password ? url.href : null;}catch{return null;} };
 
-export function initializeContributions({models,benchmarks,getSession,navigate,notify}) {
+export function initializeContributions({models,benchmarks,getSession,navigate,notify,staticMode=false}) {
   const context={models,benchmarks};
   let kind='benchmark-result', modelId=models[0].id, benchmarkId=benchmarks[0].id;
   let draft, scope=null, posting=false, feedSerial=0;
@@ -24,17 +24,18 @@ export function initializeContributions({models,benchmarks,getSession,navigate,n
     if(!response.ok) throw new Error(result.error || '服务器检查暂时不可用。');
     return result;
   }
-  draft=new SubmissionDraft({validate:value=>validateSubmission(value,context),remoteCheck,onChange:renderCheck});
+  draft=new SubmissionDraft({validate:value=>validateSubmission(value,context),remoteCheck,onChange:renderCheck,requireServer:!staticMode});
 
   function renderControls() {
     const session=getSession() || {};
     const requiresLogin=scope==='hosted' && !session.authenticated;
     submitButton.disabled=posting || !draft.canSubmit || !scope || requiresLogin;
-    submitButton.textContent=posting?'正在提交…':draft.submittedRevision===draft.revision?'此版本已提交':'提交待审核';
+    submitButton.textContent=staticMode?'下载并前往 GitHub':posting?'正在提交…':draft.submittedRevision===draft.revision?'此版本已提交':'提交待审核';
     checkButton.disabled=draft.checking || posting;
     checkButton.textContent=draft.checking?'正在检查…':'运行格式检查';
     q('#contribution-session').innerHTML=requiresLogin
       ? `登录后可提交；检查和下载无需登录。${session.signInUrl ? `<a href="${h(session.signInUrl)}" target="_top">使用 ChatGPT 登录</a>` : ''}`
+      : staticMode ? '公开版通过 GitHub PR 接收贡献。下载 JSON 后放入 submissions/ 并提交 PR，CI 会再次检查；这里不会直接保存投稿。'
       : scope==='local' ? '本地预览：投稿只保存在这台电脑，尚未发布到线上。'
       : scope==='hosted' ? '投稿及署名会公开展示。请勿填写私人信息。'
       : '正在连接投稿服务；可以先编辑和检查格式。';
@@ -47,11 +48,11 @@ export function initializeContributions({models,benchmarks,getSession,navigate,n
     q('#validation-panel').classList.remove('is-valid','is-invalid');
     if(draft.checking) { draftStatus.textContent='正在进行服务器检查'; q('#validation-title').textContent='正在检查'; q('#validation-description').textContent='浏览器检查已通过，服务器正在使用同一份规范再次检查。'; return; }
     if(!report) { draftStatus.textContent='尚有未检查的修改'; q('#validation-title').textContent='等待检查'; q('#validation-description').textContent='填写自己的运行信息后，点击“运行格式检查”。__REQUIRED 占位内容不能提交。'; return; }
-    if(report.valid && report.serverChecked) {
+    if(report.valid && (report.serverChecked || staticMode)) {
       q('#validation-panel').classList.add('is-valid');
       q('#validation-title').textContent='格式与条件检查通过';
-      q('#validation-description').textContent=report.value.kind==='model-edit'?'已通过浏览器和服务器检查。编辑内容仍需人工审核，来源内容尚未核验。':'已通过浏览器和服务器检查。分数仍为自报结果，提交后等待人工审核，尚未复现。';
-      draftStatus.textContent='当前版本检查通过';
+      q('#validation-description').textContent=staticMode?'浏览器格式检查通过。提交 PR 后由 CI 再次检查，内容仍需人工审核，结果尚未复现。':report.value.kind==='model-edit'?'已通过浏览器和服务器检查。编辑内容仍需人工审核，来源内容尚未核验。':'已通过浏览器和服务器检查。分数仍为自报结果，提交后等待人工审核，尚未复现。';
+      draftStatus.textContent=staticMode?'浏览器检查通过，待 PR 校验':'当前版本检查通过';
       q('#validation-details').hidden=false;
       q('#validation-details').innerHTML=report.value.kind==='model-edit'?'<strong id="validation-target"></strong><span>✓ 编辑字段白名单</span><span>✓ 来源链接格式</span><span>✓ 修改内容与理由字段</span><span class="validation-unverified">待人工审核 · 来源未核验</span>':'<strong id="validation-target"></strong><span>✓ 数据结构与字段</span><span>✓ 指标、单位与取值范围</span><span>✓ 评测条件与材料字段</span><span class="validation-unverified">待人工审核 · 尚未复现</span>';
       const value=report.value;
@@ -123,13 +124,14 @@ export function initializeContributions({models,benchmarks,getSession,navigate,n
     for(const token of tokens) { if(/^\d+$/.test(token)) continue; const found=editor.value.indexOf(JSON.stringify(token),start); if(found>=0) start=found; }
     editor.focus(); editor.setSelectionRange(start,Math.min(editor.value.length,start+(tokens.at(-1)?.length || 1)+2));
   });
-  q('#download-report').addEventListener('click',()=>{
+  function downloadDraft() {
     let payload; try{payload=JSON.parse(editor.value);}catch{payload=null;}
     const body=payload?json(payload):editor.value;
     const url=URL.createObjectURL(new Blob([body+'\n'],{type:'application/json'}));
     const link=document.createElement('a');link.href=url;link.download=`neuralbank-${kind}-${modelId}.json`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),0);
     notify('投稿 JSON 已下载；可使用开源仓库中的检查器验证。');
-  });
+  }
+  q('#download-report').addEventListener('click',downloadDraft);
   q('#import-report').addEventListener('change',async event=>{
     const file=event.target.files?.[0]; if(!file)return;
     if(file.size>32768){notify('JSON 文件不能超过 32 KB。');event.target.value='';return;}
@@ -149,6 +151,11 @@ export function initializeContributions({models,benchmarks,getSession,navigate,n
   submitButton.addEventListener('click',async()=>{
     const session=getSession()||{};
     if(!draft.canSubmit || posting || (scope==='hosted'&&!session.authenticated))return;
+    if(staticMode) {
+      downloadDraft();
+      window.open('https://github.com/ArthurQQQQ/NeuralBank/blob/main/CONTRIBUTING.md','_blank','noopener,noreferrer');
+      status.textContent='JSON 已下载。请按 GitHub 说明提交 PR；这里尚未创建或保存投稿。';status.className='submission-status';return;
+    }
     const payload=draft.checkedValue, revision=draft.revision;
     posting=true;renderControls();status.textContent='正在提交…';status.className='submission-status';
     try {
@@ -181,7 +188,15 @@ export function initializeContributions({models,benchmarks,getSession,navigate,n
   }
   async function loadFeed() {
     const serial=++feedSerial;
-    const refresh=q('#refresh-submissions');refresh.disabled=true;
+    const refresh=q('#refresh-submissions');
+    if(staticMode) {
+      scope='static';refresh.hidden=true;renderControls();
+      q('#submission-count').textContent='通过 PR 接入';
+      q('#submission-feed-note').textContent='公开版通过 GitHub 收集和审核投稿；自报成绩与论文成绩分别维护。';
+      q('#submission-feed').innerHTML='<div class="community-empty"><h3>在 GitHub 查看贡献与审核</h3><p>先运行格式检查，下载 JSON，再按贡献说明提交 PR。CI 检查通过仍需人工审核。</p><a class="text-button" href="https://github.com/ArthurQQQQ/NeuralBank/pulls" target="_blank" rel="noopener noreferrer">查看投稿 PR</a></div>';
+      return;
+    }
+    refresh.disabled=true;
     try {
       const response=await fetch('/api/submissions',{headers:{accept:'application/json'}});
       const result=await response.json();

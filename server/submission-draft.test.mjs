@@ -63,3 +63,16 @@ test('a successful submission locks only the version that was sent',async () => 
   draft.markSubmitted(draft.revision);
   assert.equal(draft.canSubmit,false);
 });
+
+test('static publication checks locally without claiming a server check or making a network request',async () => {
+  let requests=0;
+  const draft = new SubmissionDraft({validate:local,requireServer:false,remoteCheck:async () => {requests++;return {valid:true,errors:[]};}});
+  draft.setText('{"value":1}');
+  await draft.check();
+  assert.equal(requests,0);
+  assert.equal(draft.report.valid,true);
+  assert.equal(draft.report.serverChecked,false);
+  assert.equal(draft.canSubmit,true);
+  draft.setText('{');
+  assert.equal(draft.canSubmit,false);
+});

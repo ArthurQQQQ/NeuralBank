@@ -5,3 +5,5 @@ node_modules/
 *.log
 *.tar.gz
 .openai/*.json.tmp
+
+dist-static/

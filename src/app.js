@@ -27,6 +27,7 @@ let modelReturnView = 'learning';
 let learningLibrary;
 let librarySnapshot;
 let contributionUI;
+const staticPublication=globalThis.NEURALBANK_STATIC===true;
 const learningSequence = studyPaths.flatMap(path => path.models).map(id => models.find(model => model.id === id)).filter(Boolean);
 const scrollBehavior = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 
@@ -381,7 +382,7 @@ function renderAccount() {
   const importCount = [...loadLearned(learningStorage,modelIds)].filter(id => !snapshot.learned.has(id)).length;
   $('#account-label').textContent = session.authenticated ? session.user.displayName || '我的账户' : '我的学习库';
   if (!$('#account-dialog').open) return;
-  $('#account-content').innerHTML = session.authenticated ? `<div class="account-profile"><span class="account-avatar" aria-hidden="true">${escape((session.user.displayName || session.user.email || '我').slice(0,1))}</span><div><h3>${escape(session.user.displayName || '我的账户')}</h3><p>${escape(session.user.email || '')}</p></div></div><p class="account-status">${escape(storageLabel())}</p>${snapshot.status === 'error' ? `<p class="account-error" role="alert">${escape(snapshot.error || '同步暂未完成，更改已保留。')}</p><button class="button secondary" id="retry-learning">重新同步</button>` : ''}${importCount ? `<div class="import-panel"><h3>此浏览器还有 ${importCount} 项访客标注</h3><p>合并后会保留账户已掌握的模型。</p><button class="button secondary" id="import-learning">合并到我的学习库</button></div>` : ''}<a class="text-button account-signout" href="${escape(session.signOutUrl)}" target="_top">退出登录</a>` : `<div class="account-intro"><h3>${session.authAvailable ? '登录你的学习库' : '本地学习库'}</h3><p>${session.authAvailable ? '登录后，在不同设备上继续自己的学习进度。' : '你的掌握标注会保存在此浏览器。云端登录将在托管站点恢复后启用。'}</p>${session.authAvailable && session.signInUrl ? `<a class="button primary" href="${escape(session.signInUrl)}" target="_top">使用 ChatGPT 登录</a>` : ''}<span class="account-local-count">此浏览器已掌握 ${state.learned.size} / ${models.length} 个模型</span></div>`;
+  $('#account-content').innerHTML = session.authenticated ? `<div class="account-profile"><span class="account-avatar" aria-hidden="true">${escape((session.user.displayName || session.user.email || '我').slice(0,1))}</span><div><h3>${escape(session.user.displayName || '我的账户')}</h3><p>${escape(session.user.email || '')}</p></div></div><p class="account-status">${escape(storageLabel())}</p>${snapshot.status === 'error' ? `<p class="account-error" role="alert">${escape(snapshot.error || '同步暂未完成，更改已保留。')}</p><button class="button secondary" id="retry-learning">重新同步</button>` : ''}${importCount ? `<div class="import-panel"><h3>此浏览器还有 ${importCount} 项访客标注</h3><p>合并后会保留账户已掌握的模型。</p><button class="button secondary" id="import-learning">合并到我的学习库</button></div>` : ''}<a class="text-button account-signout" href="${escape(session.signOutUrl)}" target="_top">退出登录</a>` : `<div class="account-intro"><h3>${session.authAvailable ? '登录你的学习库' : '本地学习库'}</h3><p>${session.authAvailable ? '登录后，在不同设备上继续自己的学习进度。' : staticPublication ? '公开版的学习进度保存在此浏览器。你可以直接学习；账户同步由服务器版提供。' : '你的掌握标注会保存在此浏览器。云端登录将在托管站点恢复后启用。'}</p>${session.authAvailable && session.signInUrl ? `<a class="button primary" href="${escape(session.signInUrl)}" target="_top">使用 ChatGPT 登录</a>` : ''}<span class="account-local-count">此浏览器已掌握 ${state.learned.size} / ${models.length} 个模型</span></div>`;
 }
 $('#account-button').addEventListener('click',() => { showDialog('account-dialog'); renderAccount(); });
 $('#account-content').addEventListener('click',event => { if (event.target.closest('#import-learning')) learningLibrary.importGuest(); if (event.target.closest('#retry-learning')) learningLibrary.retry(); });
@@ -431,8 +432,8 @@ window.addEventListener('hashchange',() => {
 });
 window.addEventListener('popstate',() => { if (!location.hash.startsWith('#model/')) navigate(location.hash.slice(1),true); });
 initializeCatalog(); updateProgress(); renderCatalog(); renderBenchmarks();
-contributionUI=initializeContributions({models,benchmarks,getSession:()=>librarySnapshot?.session,navigate,notify:toast});
-learningLibrary = createLearningLibrary({storage:learningStorage,validIds:modelIds,fetcher:window.fetch.bind(window),onChange:onLearningChange});
+contributionUI=initializeContributions({models,benchmarks,getSession:()=>librarySnapshot?.session,navigate,notify:toast,staticMode:staticPublication});
+learningLibrary = createLearningLibrary({storage:learningStorage,validIds:modelIds,fetcher:staticPublication ? async () => new Response(JSON.stringify({authAvailable:false,authenticated:false,user:null,signInUrl:null,signOutUrl:null}),{headers:{'content-type':'application/json'}}) : window.fetch.bind(window),onChange:onLearningChange});
 librarySnapshot = learningLibrary.getSnapshot();
 learningLibrary.initialize();
 window.addEventListener('focus',() => { if (document.visibilityState === 'visible') void learningLibrary.refresh(); });
